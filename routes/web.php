@@ -194,7 +194,7 @@ Route::middleware(['auth', 'role:cdrrmo_admin'])->prefix('cdrrmo_admin')->group(
 });
 
 // Super Admin-only routes
-Route::middleware(['auth', 'role:super_admin'])->prefix('super_admin')->group(function () {
+Route::middleware(['auth', 'role:super_admin|cdrrmo_admin'])->prefix('super_admin')->group(function () {
     Route::get('/dashboard', [SuperAdminController::class, 'index'])->name('super_admin.dashboard');
     Route::get('/accounts', [SuperAdminController::class, 'accounts'])->name('super_admin.accounts');
     Route::put('/update/account/{id}', [SuperAdminController::class, 'updateAccount'])->name('super_admin.account.update');

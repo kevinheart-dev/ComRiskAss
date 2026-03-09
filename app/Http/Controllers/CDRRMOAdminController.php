@@ -37,11 +37,15 @@ class CDRRMOAdminController extends Controller
             $cra = CommunityRiskAssessment::latest('year')->first();
             $year = $cra?->year;
         } else {
-            // Case 2: User selected a year or non-admin
             $year = $selectedYear;
+            if (!$selectedYear){
+                $cra = CommunityRiskAssessment::where('year', $year)->first();
+            }else{
 
             // Try to fetch CRA for selected year
             $cra = CommunityRiskAssessment::where('year', $year)->first();
+            }
+            // Case 2: User selected a year or non-admin
         }
 
         // Check if CRA exists and has population data
