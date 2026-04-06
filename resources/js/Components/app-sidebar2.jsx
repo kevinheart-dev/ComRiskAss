@@ -250,12 +250,6 @@ export function AppSidebar({ auth }) {
 
     const items = [
         {
-            title: "Barangay Officer",
-            url: "/barangay_officer/dashboard",
-            icon: LayoutDashboard,
-            roles: ["barangay_officer"],
-        },
-        {
             title: "CDRRMO Dashboard",
             url: "/cdrrmo_admin/dashboard",
             icon: LayoutDashboard,
@@ -273,258 +267,6 @@ export function AppSidebar({ auth }) {
             icon: LayoutDashboard,
             roles: ["admin"],
         },
-        // {
-        //     title: "Barangay Information",
-        //     icon: Home,
-        //     roles: ["barangay_officer", "admin"],
-        //     submenu: [
-        //         {
-        //             title: "Accounts",
-        //             url: "/user",
-        //             icon: CircleUser,
-        //             roles: ["admin"],
-        //         },
-        //         {
-        //             title: "Documents",
-        //             url: "/document",
-        //             icon: FileText,
-        //             roles: ["barangay_officer", "admin"],
-        //         },
-        //         {
-        //             title: "Profile",
-        //             url: "/barangay_profile",
-        //             icon: UserPen,
-        //             roles: ["admin"],
-        //         },
-        //         {
-        //             title: "Activity Logs",
-        //             url: "/activity_log",
-        //             icon: Logs,
-        //             roles: ["admin"],
-        //         },
-        //     ],
-        // },
-        // {
-        //     title: "Barangay Resources",
-        //     icon: Bolt,
-        //     roles: ["barangay_officer", "admin"],
-        //     submenu: [
-        //         {
-        //             title: "Infrastructure",
-        //             url: "/barangay_infrastructure",
-        //             icon: Building2,
-        //             roles: ["barangay_officer", "admin"],
-        //         },
-        //         {
-        //             title: "Institutions",
-        //             url: "/barangay_institution",
-        //             icon: Users,
-        //             roles: ["barangay_officer", "admin"],
-        //         },
-        //         {
-        //             title: "Facilities",
-        //             url: "/barangay_facility",
-        //             icon: School,
-        //             roles: ["barangay_officer", "admin"],
-        //         },
-        //         {
-        //             title: "Projects",
-        //             url: "/barangay_project",
-        //             icon: Hammer,
-        //             roles: ["barangay_officer", "admin"],
-        //         },
-        //         {
-        //             title: "Inventories",
-        //             url: "/inventory",
-        //             icon: ListChecks,
-        //             roles: ["barangay_officer", "admin"],
-        //         },
-        //         {
-        //             title: "Roads",
-        //             url: "/barangay_road",
-        //             icon: BusFront,
-        //             roles: ["barangay_officer", "admin"],
-        //         },
-        //         {
-        //             title: "Officials",
-        //             url: "/barangay_official",
-        //             icon: ContactRound,
-        //             roles: ["barangay_officer", "admin"],
-        //         },
-        //         {
-        //             title: "Bodies of Water",
-        //             url: "/water",
-        //             icon: Waves,
-        //             roles: ["barangay_officer", "admin"],
-        //         },
-        //         {
-        //             title: "Bodies of Land",
-        //             url: "/land",
-        //             icon: Mountain,
-        //             roles: ["barangay_officer", "admin"],
-        //         },
-        //         {
-        //             title: "Street List",
-        //             url: "/street",
-        //             icon: SignpostBig,
-        //             roles: ["admin"],
-        //         },
-        //     ],
-        // },
-        // {
-        //     title: "Residents Information",
-        //     icon: FileUser,
-        //     roles: ["barangay_officer", "admin"],
-        //     submenu: [
-        //         {
-        //             title: "Information Table",
-        //             url: "/resident",
-        //             icon: Table,
-        //             roles: ["barangay_officer", "admin"],
-        //         },
-        //         {
-        //             title: "Senior Citizen",
-        //             url: "/senior_citizen",
-        //             icon: UsersRound,
-        //             roles: ["barangay_officer", "admin"],
-        //         },
-        //         {
-        //             title: "Families",
-        //             url: "/family",
-        //             icon: SquareUserRound,
-        //             roles: ["barangay_officer", "admin"],
-        //         },
-        //         {
-        //             title: "Households",
-        //             url: "/household",
-        //             icon: House,
-        //             roles: ["barangay_officer", "admin"],
-        //         },
-        //         {
-        //             title: "Household Overview",
-        //             url: "/overview",
-        //             icon: UtilityPole,
-        //             roles: ["barangay_officer", "admin"],
-        //         },
-        //         {
-        //             title: "Vehicles",
-        //             url: "/vehicle",
-        //             icon: CarFront,
-        //             roles: ["barangay_officer", "admin"],
-        //         },
-        //         {
-        //             title: "Education",
-        //             url: "/education",
-        //             icon: GraduationCap,
-        //             roles: ["barangay_officer", "admin"],
-        //         },
-        //         {
-        //             title: "Occupation/Livelihood",
-        //             url: "/occupation",
-        //             icon: BriefcaseBusiness,
-        //             roles: ["barangay_officer", "admin"],
-        //         },
-        //     ],
-        // },
-        // {
-        //     title: "Medical Information",
-        //     icon: HeartPulse,
-        //     roles: ["barangay_officer", "admin"],
-        //     submenu: [
-        //         {
-        //             title: "Information Table",
-        //             url: "/medical",
-        //             icon: Table,
-        //             roles: ["barangay_officer", "admin"],
-        //         },
-        //         {
-        //             title: "Allergies",
-        //             url: "/allergy",
-        //             icon: Tablets,
-        //             roles: ["barangay_officer", "admin"],
-        //         },
-        //         {
-        //             title: "Child Health Records",
-        //             url: "/child_record",
-        //             icon: Baby,
-        //             roles: ["barangay_officer", "admin"],
-        //         },
-        //         {
-        //             title: "Medical Condition",
-        //             url: "/medical_condition",
-        //             icon: Stethoscope,
-        //             roles: ["barangay_officer", "admin"],
-        //         },
-        //         {
-        //             title: "Disabilities",
-        //             url: "/disability",
-        //             icon: Accessibility,
-        //             roles: ["barangay_officer", "admin"],
-        //         },
-        //         {
-        //             title: "Medications",
-        //             url: "/medication",
-        //             icon: Pill,
-        //             roles: ["barangay_officer", "admin"],
-        //         },
-        //         {
-        //             title: "Pregnancy Records",
-        //             url: "/pregnancy",
-        //             icon: SquareActivity,
-        //             roles: ["barangay_officer", "admin"],
-        //         },
-        //         {
-        //             title: "Vaccinations",
-        //             url: "/vaccination",
-        //             icon: Syringe,
-        //             roles: ["barangay_officer", "admin"],
-        //         },
-        //         {
-        //             title: "Deaths",
-        //             url: "/death/index",
-        //             icon: PersonStanding,
-        //             roles: ["barangay_officer", "admin"],
-        //         },
-        //     ],
-        // },
-        // {
-        //     title: "Issuance",
-        //     icon: Files,
-        //     roles: ["barangay_officer", "admin"],
-        //     submenu: [
-        //         {
-        //             title: "Certificate Issuance",
-        //             url: "/certificate/index",
-        //             icon: FileText,
-        //             roles: ["barangay_officer", "admin"],
-        //         },
-        //     ],
-        // },
-        // {
-        //     title: "Katarungang Pambarangay",
-        //     icon: Scale,
-        //     roles: ["barangay_officer", "admin"],
-        //     submenu: [
-        //         {
-        //             title: "Blotter Reports",
-        //             url: "/blotter_report",
-        //             icon: ScrollText,
-        //             roles: ["barangay_officer", "admin"],
-        //         },
-        //         {
-        //             title: "Summon",
-        //             url: "/summon",
-        //             icon: MessageSquareWarning,
-        //             roles: ["barangay_officer", "admin"],
-        //         },
-        //     ],
-        // },
-        // {
-        //     title: "Reports",
-        //     url: "/report",
-        //     icon: Flag,
-        //     roles: ["barangay_officer", "admin"],
-        // },
         {
             title: "Demographic Summary",
             icon: FileStack,
@@ -848,44 +590,6 @@ export function AppSidebar({ auth }) {
             icon: ListCheck,
             roles: ["super_admin"],
         },
-        // {
-        //     title: "Statistics of Barangays",
-        //     url: "#",
-        //     icon: TableOfContents,
-        //     roles: ["super_admin"],
-        //     submenu: [
-        //         {
-        //             title: "Population Summary",
-        //             url: "/super_admin/statistics/population-summary",
-        //             icon: Users,
-        //             roles: ["super_admin"],
-        //         },
-        //         {
-        //             title: "Household Summary",
-        //             url: "#",
-        //             icon: Users,
-        //             roles: ["super_admin"],
-        //         },
-        //         {
-        //             title: "Senior Citizen Summary",
-        //             url: "#",
-        //             icon: Users,
-        //             roles: ["super_admin"],
-        //         },
-        //         {
-        //             title: "Occupation Summary",
-        //             url: "#",
-        //             icon: Users,
-        //             roles: ["super_admin"],
-        //         },
-        //         {
-        //             title: "Education Summary",
-        //             url: "#",
-        //             icon: Users,
-        //             roles: ["super_admin"],
-        //         },
-        //     ],
-        // },
     ];
 
     const normalize = (u) => {
@@ -967,17 +671,6 @@ export function AppSidebar({ auth }) {
         }
     };
 
-    // const handleYearChange = (e) => {
-    //     const year = e.target.value;
-    //     setSelectedYear(year);
-    //     sessionStorage.setItem("cra_year", year);
-
-    //     router.get(
-    //         window.location.pathname,
-    //         { year },
-    //         { preserveState: true, replace: true },
-    //     );
-    // };
     const handleYearChange = (e) => {
         const year = e.target.value;
         setSelectedYear(year);
@@ -1425,11 +1118,13 @@ export function AppSidebar({ auth }) {
             </SidebarFooter>
             <DeleteConfirmationModal
                 isOpen={isDeleteModalOpen}
-                onClose={() => {
-                    setIsDeleteModalOpen(false);
-                }}
+                onClose={() => setIsDeleteModalOpen(false)}
                 onConfirm={confirmDelete}
                 residentId={recordToDelete}
+                // optional enhancements 👇
+                itemName={`CRA Record #${recordToDelete}`}
+                itemLabel="CRA Record"
+                note="Deleting this record will permanently remove all related data."
             />
         </Sidebar>
     );
