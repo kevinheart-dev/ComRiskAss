@@ -84,6 +84,7 @@ Route::get('/test-mail-env', function () {
         'password' => env('MAIL_PASSWORD'),
     ];
 });
+Route::post('user/confirmpassword', [UserController::class, 'confirmPassword'])->name('user.confirm');
 
 // Admin-only routes
 Route::middleware(['auth', 'role:barangay_officer|cdrrmo_admin|super_admin|admin'])->group(function () {
