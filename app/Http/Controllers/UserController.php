@@ -10,6 +10,7 @@ use App\Models\User;
 use Hash;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
 
@@ -249,5 +250,25 @@ class UserController extends Controller
                 'error'   => $e->getMessage(), // optional: remove in production
             ], 500);
         }
+    }
+    public function resetPassword(Request $request, User $user)
+    {
+        $validated = $request->validate([
+            'password' => [
+                'required',
+                'confirmed', // This expects a field password_confirmation
+                Password::min(8) // You can chain more rules: ->letters()->numbers()->symbols()
+                    ->letters()
+                    ->numbers()
+                    ->symbols()],
+        ]);
+
+        $user->update([
+            'password' => Hash::make($validated['password']),
+        ]);
+
+        return response()->json([
+            'message' => 'Password reset successfully.',
+        ]);
     }
 }

@@ -268,6 +268,18 @@ export function AppSidebar({ auth }) {
             roles: ["admin"],
         },
         {
+            title: "Barangay Accounts",
+            icon: FileStack,
+            roles: ["cdrrmo_admin"],
+            url: "/cdrrmo_admin/accounts",
+        },
+        {
+            title: "Barangay Accounts",
+            icon: FileStack,
+            roles: ["cdrrmo_admin"],
+            url: "/cdrrmo_admin/accounts",
+        },
+        {
             title: "Demographic Summary",
             icon: FileStack,
             roles: ["cdrrmo_admin"],
@@ -533,12 +545,6 @@ export function AppSidebar({ auth }) {
                     progress: cra.percentage ?? 0,
                 }));
             })(),
-        },
-        {
-            title: "Barangay Accounts",
-            icon: FileStack,
-            roles: ["cdrrmo_admin"],
-            url: "/cdrrmo_admin/user",
         },
         {
             title: "CRA Settings",
