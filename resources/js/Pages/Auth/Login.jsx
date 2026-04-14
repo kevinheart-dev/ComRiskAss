@@ -5,7 +5,7 @@ import PrimaryButton from "@/Components/PrimaryButton";
 import TextInput from "@/Components/TextInput";
 import GuestLayout from "@/Layouts/GuestLayout";
 import { Head, Link, useForm } from "@inertiajs/react";
-import { toast } from "sonner"; // import sonner
+import { toast } from "sonner";
 
 export default function Login({ status, canResetPassword }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -20,7 +20,7 @@ export default function Login({ status, canResetPassword }) {
         post(route("login"), {
             onFinish: () => reset("password"),
             onError: (err) => {
-                console.error("Login error details:", err); // for debugging
+                console.error("Login error details:", err);
 
                 if (err.email) {
                     toast.error(`Email Error: ${err.email}`);
@@ -30,7 +30,7 @@ export default function Login({ status, canResetPassword }) {
                     toast.error(`Login Failed: ${err.message}`);
                 } else {
                     toast.error(
-                        "Login failed. Please check your credentials and try again."
+                        "Login failed. Please check your credentials and try again.",
                     );
                 }
             },
@@ -40,79 +40,127 @@ export default function Login({ status, canResetPassword }) {
     return (
         <GuestLayout>
             <Head title="Log in" />
-            {status && (
-                <div className="mb-4 text-sm font-medium text-green-600 animate-fadeIn">
-                    {status}
-                </div>
-            )}
 
-            <form onSubmit={submit} className="space-y-4 animate-slideUp">
-                <div className="transition-all duration-300 hover:scale-[1.01]">
-                    <InputLabel htmlFor="email" value="Email" />
+            <div className="w-full">
+                {/* Header */}
+                <div className="mb-8 text-center">
+                    <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-600 shadow-lg shadow-indigo-200">
+                        <span className="text-xl text-white">🔐</span>
+                    </div>
 
-                    <TextInput
-                        id="email"
-                        type="email"
-                        name="email"
-                        value={data.email}
-                        className="mt-1 block w-full transition-all duration-300 focus:ring-2 focus:ring-indigo-400"
-                        autoComplete="username"
-                        isFocused={true}
-                        onChange={(e) => setData("email", e.target.value)}
-                    />
-
-                    <InputError message={errors.email} className="mt-2" />
+                    <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+                        Welcome Back
+                    </h1>
+                    <p className="mt-2 text-sm leading-6 text-gray-500">
+                        Sign in to securely access your account and continue
+                        managing your records.
+                    </p>
                 </div>
 
-                <div className="transition-all duration-300 hover:scale-[1.01]">
-                    <InputLabel htmlFor="password" value="Password" />
+                {/* Status Message */}
+                {status && (
+                    <div className="mb-5 rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700 shadow-sm">
+                        {status}
+                    </div>
+                )}
 
-                    <TextInput
-                        id="password"
-                        type="password"
-                        name="password"
-                        value={data.password}
-                        className="mt-1 block w-full transition-all duration-300 focus:ring-2 focus:ring-indigo-400"
-                        autoComplete="current-password"
-                        onChange={(e) => setData("password", e.target.value)}
-                    />
+                {/* Form Card */}
+                <div className="rounded-3xl border border-gray-100 bg-white/90 p-6 shadow-[0_20px_60px_-20px_rgba(79,70,229,0.25)] backdrop-blur-sm">
+                    <form onSubmit={submit} className="space-y-5">
+                        <div>
+                            <InputLabel
+                                htmlFor="email"
+                                value="Email Address"
+                                className="text-sm font-semibold text-gray-700"
+                            />
 
-                    <InputError message={errors.password} className="mt-2" />
-                </div>
+                            <TextInput
+                                id="email"
+                                type="email"
+                                name="email"
+                                value={data.email}
+                                className="mt-2 block w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-900 shadow-sm transition duration-200 placeholder:text-gray-400 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200"
+                                autoComplete="username"
+                                isFocused={true}
+                                onChange={(e) =>
+                                    setData("email", e.target.value)
+                                }
+                                placeholder="you@example.com"
+                            />
 
-                <div className="mt-2 block">
-                    <label className="flex items-center">
-                        <Checkbox
-                            name="remember"
-                            checked={data.remember}
-                            onChange={(e) =>
-                                setData("remember", e.target.checked)
-                            }
-                        />
-                        <span className="ms-2 text-sm text-gray-600">
-                            Remember me
-                        </span>
-                    </label>
-                </div>
+                            <InputError
+                                message={errors.email}
+                                className="mt-2"
+                            />
+                        </div>
 
-                <div className="mt-4 flex items-center justify-between">
-                    {canResetPassword && (
-                        <Link
-                            href={route("password.request")}
-                            className="rounded-md text-sm text-gray-600 underline transition-colors duration-300 hover:text-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                        <div>
+                            <div className="flex items-center justify-between">
+                                <InputLabel
+                                    htmlFor="password"
+                                    value="Password"
+                                    className="text-sm font-semibold text-gray-700"
+                                />
+
+                                {canResetPassword && (
+                                    <Link
+                                        href={route("password.request")}
+                                        className="text-sm font-medium text-indigo-600 transition duration-200 hover:text-indigo-800"
+                                    >
+                                        Forgot password?
+                                    </Link>
+                                )}
+                            </div>
+
+                            <TextInput
+                                id="password"
+                                type="password"
+                                name="password"
+                                value={data.password}
+                                className="mt-2 block w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-900 shadow-sm transition duration-200 placeholder:text-gray-400 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200"
+                                autoComplete="current-password"
+                                onChange={(e) =>
+                                    setData("password", e.target.value)
+                                }
+                                placeholder="Enter your password"
+                            />
+
+                            <InputError
+                                message={errors.password}
+                                className="mt-2"
+                            />
+                        </div>
+
+                        <div className="flex items-center justify-between pt-1">
+                            <label className="flex items-center gap-2 text-sm text-gray-600">
+                                <Checkbox
+                                    name="remember"
+                                    checked={data.remember}
+                                    onChange={(e) =>
+                                        setData("remember", e.target.checked)
+                                    }
+                                />
+                                <span>Remember me</span>
+                            </label>
+                        </div>
+
+                        <PrimaryButton
+                            className="flex w-full items-center justify-center rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 px-4 py-3 text-sm font-semibold text-white shadow-md transition duration-300 hover:-translate-y-0.5 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                            disabled={processing}
                         >
-                            Forgot your password?
-                        </Link>
-                    )}
+                            {processing ? "Signing in..." : "Log in"}
+                        </PrimaryButton>
+                    </form>
 
-                    <PrimaryButton
-                        className="ms-4 transform transition-all duration-300 hover:scale-105 hover:shadow-md disabled:opacity-50"
-                        disabled={processing}
-                    >
-                        Log in
-                    </PrimaryButton>
+                    {/* Bottom Detail */}
+                    <div className="mt-6 border-t border-gray-100 pt-4 text-center">
+                        <p className="text-xs leading-5 text-gray-400">
+                            Protected access. Your credentials are securely
+                            processed.
+                        </p>
+                    </div>
                 </div>
-            </form>
+            </div>
         </GuestLayout>
     );
 }
