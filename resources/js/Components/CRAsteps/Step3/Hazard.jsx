@@ -81,7 +81,7 @@ function HazardTable({ hazards, updateField, addHazard, removeHazard }) {
                                         updateField(
                                             h.index,
                                             "hazard",
-                                            e.target.value
+                                            e.target.value,
                                         )
                                     }
                                 >
@@ -113,7 +113,7 @@ function HazardTable({ hazards, updateField, addHazard, removeHazard }) {
                                                 updateField(
                                                     h.index,
                                                     f,
-                                                    e.target.value
+                                                    e.target.value,
                                                 )
                                             }
                                         >
@@ -125,7 +125,7 @@ function HazardTable({ hazards, updateField, addHazard, removeHazard }) {
                                             ))}
                                         </select>
                                     </td>
-                                )
+                                ),
                             )}
                             <td className="border px-2 py-1">
                                 <textarea
@@ -135,7 +135,7 @@ function HazardTable({ hazards, updateField, addHazard, removeHazard }) {
                                         updateField(
                                             h.index,
                                             "basis",
-                                            e.target.value
+                                            e.target.value,
                                         )
                                     }
                                     placeholder="Enter Basis"
@@ -150,7 +150,7 @@ function HazardTable({ hazards, updateField, addHazard, removeHazard }) {
                                         updateField(
                                             h.index,
                                             "average",
-                                            e.target.value
+                                            e.target.value,
                                         )
                                     }
                                 />

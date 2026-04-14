@@ -56,30 +56,125 @@ class CRAController extends Controller
     {
         dd('yes');
     }
+    // without data
+    // public function create(Request $request)
+    // {
+    //     try {
+    //         $user = auth()->user();
+    //         $barangay_id = $user->barangay_id ?? null;
+
+    //         if (!$barangay_id) {
+    //             return Inertia::render("BarangayOfficer/CRA/Create", [
+    //                 'progress' => null,
+    //                 'error' => 'Barangay not found for this user.'
+    //             ]);
+    //         }
+
+    //         // 🔹 Get the year from the query string (?year=2025)
+    //         $year = $request->query('year');
+
+    //         // 🔹 Find CRA record by year (if provided), otherwise latest
+    //         $craQuery = CommunityRiskAssessment::query();
+    //         $cra = $year
+    //             ? $craQuery->where('year', $year)->first()
+    //             : $craQuery->latest('year')->first();
+
+    //         if (!$cra) {
+    //             return Inertia::render("BarangayOfficer/CRA/Create", [
+    //                 'progress' => [
+    //                     'barangay_id' => $barangay_id,
+    //                     'cra_id' => null,
+    //                     'percentage' => 0,
+    //                     'status' => 'Not started',
+    //                     'submitted_at' => null,
+    //                     'last_updated' => null,
+    //                 ],
+    //                 'error' => $year
+    //                     ? "No CRA record found for the year {$year}."
+    //                     : "No Community Risk Assessments available yet.",
+    //             ]);
+    //         }
+
+    //         // 🔹 Fetch CRA progress
+    //         $progress = CRAProgress::where('barangay_id', $barangay_id)
+    //             ->where('cra_id', $cra->id)
+    //             ->latest()
+    //             ->first();
+
+    //         $progressData = $progress
+    //             ? [
+    //                 'barangay_id' => $progress->barangay_id,
+    //                 'cra_id' => $progress->cra_id,
+    //                 'percentage' => (float) $progress->percentage,
+    //                 'status' => $progress->percentage >= 100 ? 'Completed' : 'In Progress',
+    //                 'submitted_at' => $progress->submitted_at
+    //                     ? Carbon::parse($progress->submitted_at)->toDateTimeString()
+    //                     : null,
+    //                 'last_updated' => $progress->updated_at
+    //                     ? Carbon::parse($progress->updated_at)->toDateTimeString()
+    //                     : null,
+    //             ]
+    //             : [
+    //                 'barangay_id' => $barangay_id,
+    //                 'cra_id' => $cra->id,
+    //                 'percentage' => 0,
+    //                 'status' => 'Not started',
+    //                 'submitted_at' => null,
+    //                 'last_updated' => null,
+    //             ];
+
+    //         //$craData = $this->brgyDataCollectionInternal($barangay_id);
+
+    //         return Inertia::render("BarangayOfficer/CRA/Create", [
+    //             'progress' => $progressData,
+    //             'barangay_id' => $barangay_id,
+    //             // 'year' => $cra->year,
+    //             // 'craData' => $craData,
+    //         ]);
+    //     } catch (\Exception $e) {
+    //         return Inertia::render("BarangayOfficer/CRA/Create", [
+    //             'progress' => null,
+    //             'error' => 'Error fetching CRA progress: ' . $e->getMessage(),
+    //         ]);
+    //     }
+    // }
+
+    // with data
     public function create(Request $request)
     {
         try {
             $user = auth()->user();
             $barangay_id = $user->barangay_id ?? null;
+            $year = $request->query('year');
 
             if (!$barangay_id) {
-                return Inertia::render("BarangayOfficer/CRA/Create", [
+                return Inertia::render('BarangayOfficer/CRA/Create', [
                     'progress' => null,
-                    'error' => 'Barangay not found for this user.'
+                    'barangay_id' => null,
+                    'year' => $year,
+                    'cra_id' => null,
+                    'craData' => [],
+                    'error' => 'Barangay not found for this user.',
                 ]);
             }
 
-            // 🔹 Get the year from the query string (?year=2025)
-            $year = $request->query('year');
+            if (!$year) {
+                return Inertia::render('BarangayOfficer/CRA/Create', [
+                    'progress' => null,
+                    'barangay_id' => $barangay_id,
+                    'year' => null,
+                    'cra_id' => null,
+                    'craData' => [],
+                    'error' => 'Year is required.',
+                ]);
+            }
 
-            // 🔹 Find CRA record by year (if provided), otherwise latest
-            $craQuery = CommunityRiskAssessment::query();
-            $cra = $year
-                ? $craQuery->where('year', $year)->first()
-                : $craQuery->latest('year')->first();
+            // Find CRA by selected year
+            $cra = CommunityRiskAssessment::where('year', $year)->first();
 
+            // If CRA for selected year does not exist, return empty array
             if (!$cra) {
-                return Inertia::render("BarangayOfficer/CRA/Create", [
+                return Inertia::render('BarangayOfficer/CRA/Create', [
                     'progress' => [
                         'barangay_id' => $barangay_id,
                         'cra_id' => null,
@@ -88,13 +183,15 @@ class CRAController extends Controller
                         'submitted_at' => null,
                         'last_updated' => null,
                     ],
-                    'error' => $year
-                        ? "No CRA record found for the year {$year}."
-                        : "No Community Risk Assessments available yet.",
+                    'barangay_id' => $barangay_id,
+                    'year' => $year,
+                    'cra_id' => null,
+                    'craData' => [],
+                    'error' => null,
                 ]);
             }
 
-            // 🔹 Fetch CRA progress
+            // Fetch CRA progress for this barangay and CRA
             $progress = CRAProgress::where('barangay_id', $barangay_id)
                 ->where('cra_id', $cra->id)
                 ->latest()
@@ -122,18 +219,111 @@ class CRAController extends Controller
                     'last_updated' => null,
                 ];
 
-            //$craData = $this->brgyDataCollectionInternal($barangay_id);
+            // Load barangay with CRA-filtered relations
+            $barangay = Barangay::with([
+                'generalPopulation' => fn($q) => $q->where('cra_id', $cra->id),
+                'populationGenders' => fn($q) => $q->where('cra_id', $cra->id),
+                'populationAgeGroups' => fn($q) => $q->where('cra_id', $cra->id),
+                'populationExposures' => fn($q) => $q->where('cra_id', $cra->id)->with('hazard'),
+                'bdrrmcDirectories' => fn($q) => $q->where('cra_id', $cra->id),
+                'bdrrmcTrainings' => fn($q) => $q->where('cra_id', $cra->id),
 
-            return Inertia::render("BarangayOfficer/CRA/Create", [
+                'disasterOccurances' => fn($q) => $q->where('cra_id', $cra->id)->with([
+                    'agriDamages',
+                    'damages',
+                    'effectImpacts',
+                    'lifelines',
+                    'populationImpacts',
+                ]),
+
+                'disasterInventories' => fn($q) => $q->where('cra_id', $cra->id)->with('hazard'),
+                'disasterRiskPopulations' => fn($q) => $q->where('cra_id', $cra->id)->with('hazard'),
+                'primaryFacilities' => fn($q) => $q->where('cra_id', $cra->id),
+                'infraFacilities' => fn($q) => $q->where('cra_id', $cra->id),
+                'institutions' => fn($q) => $q->where('cra_id', $cra->id),
+                'roadNetworks' => fn($q) => $q->where('cra_id', $cra->id),
+                'publicTransportations' => fn($q) => $q->where('cra_id', $cra->id),
+                'houseBuilds' => fn($q) => $q->where('cra_id', $cra->id),
+                'houseOwnerships' => fn($q) => $q->where('cra_id', $cra->id),
+                'householdServices' => fn($q) => $q->where('cra_id', $cra->id),
+                'livelihoodStatistics' => fn($q) => $q->where('cra_id', $cra->id),
+                'livelihoodEvacuationSites' => fn($q) => $q->where('cra_id', $cra->id),
+                'reliefDistributions' => fn($q) => $q->where('cra_id', $cra->id),
+                'reliefDistributionProcesses' => fn($q) => $q->where('cra_id', $cra->id),
+                'equipmentInventories' => fn($q) => $q->where('cra_id', $cra->id),
+                'evacuationCenters' => fn($q) => $q->where('cra_id', $cra->id),
+                'evacuationInventories' => fn($q) => $q->where('cra_id', $cra->id),
+                'evacuationPlans' => fn($q) => $q->where('cra_id', $cra->id),
+                'familiesAtRisk' => fn($q) => $q->where('cra_id', $cra->id),
+                'hazardRisks' => fn($q) => $q->where('cra_id', $cra->id)->with('hazard'),
+                'assessmentMatrices' => fn($q) => $q->where('cra_id', $cra->id)->with('hazard'),
+                'illnessesStats' => fn($q) => $q->where('cra_id', $cra->id),
+                'disabilityStatistics' => fn($q) => $q->where('cra_id', $cra->id),
+                'humanResources' => fn($q) => $q->where('cra_id', $cra->id),
+                'affectedPlaces' => fn($q) => $q->where('cra_id', $cra->id)->with('hazard'),
+                'prepositionedInventories' => fn($q) => $q->where('cra_id', $cra->id),
+            ])->findOrFail($barangay_id);
+
+            $data = $barangay->dataCollection();
+
+            $craData = [
+                'cra' => [
+                    'id' => $cra->id,
+                    'year' => $cra->year,
+                ],
+                'barangay' => $data['barangay'] ?? null,
+                'population_genders' => $data['population_genders'] ?? [],
+                'population_age_groups' => $data['population_age_groups'] ?? [],
+                'population_exposures' => $data['population_exposures'] ?? [],
+                'pwdDistribution' => $data['pwdDistribution'] ?? [],
+                'bdrrmc_directory' => $data['bdrrmc_directory'] ?? [],
+                'bdrrmc_trainings' => $data['bdrrmc_trainings'] ?? [],
+                'disasters' => $data['disasters'] ?? [],
+                'disaster_inventories' => $data['disaster_inventories'] ?? [],
+                'disaster_per_purok' => $data['disaster_per_purok'] ?? [],
+                'primary_facilities' => $data['primary_facilities'] ?? [],
+                'infra_facilities' => $data['infra_facilities'] ?? [],
+                'institutions' => $data['institutions'] ?? [],
+                'road_networks' => $data['road_networks'] ?? [],
+                'public_transportations' => $data['public_transportations'] ?? [],
+                'house_builds' => $data['house_builds'] ?? [],
+                'house_ownerships' => $data['house_ownerships'] ?? [],
+                'household_services' => $data['household_services'] ?? [],
+                'livelihood_statistics' => $data['livelihood_statistics'] ?? [],
+                'livelihood_evacuation' => $data['livelihood_evacuation'] ?? [],
+                'relief_distributions' => $data['relief_distributions'] ?? [],
+                'relief_distribution_processes' => $data['relief_distribution_processes'] ?? [],
+                'equipment_inventories' => $data['equipment_inventories'] ?? [],
+                'evacuation_list' => $data['evacuation_list'] ?? [],
+                'evacuation_center_inventory' => $data['evacuation_center_inventory'] ?? [],
+                'evacuation_plans' => $data['evacuation_plans'] ?? [],
+                'families_at_risk' => $data['families_at_risk'] ?? [],
+                'hazard_risks' => $data['hazard_risks'] ?? [],
+                'vulnerabilities' => $data['vulnerabilities'] ?? [],
+                'risks' => $data['risks'] ?? [],
+                'illnesses_stats' => $data['illnesses_stats'] ?? [],
+                'disability_statistics' => $data['disability_statistics'] ?? [],
+                'human_resources' => $data['human_resources'] ?? [],
+                'affected_areas' => $data['affected_areas'] ?? [],
+                'prepositioned_inventories' => $data['prepositioned_inventories'] ?? [],
+            ];
+            // return json_encode($craData);
+            return Inertia::render('BarangayOfficer/CRA/Create', [
                 'progress' => $progressData,
                 'barangay_id' => $barangay_id,
-                // 'year' => $cra->year,
-                // 'craData' => $craData,
+                'year' => $cra->year,
+                'cra_id' => $cra->id,
+                'craData' => $craData,
+                'error' => null,
             ]);
         } catch (\Exception $e) {
-            return Inertia::render("BarangayOfficer/CRA/Create", [
+            return Inertia::render('BarangayOfficer/CRA/Create', [
                 'progress' => null,
-                'error' => 'Error fetching CRA progress: ' . $e->getMessage(),
+                'barangay_id' => auth()->user()->barangay_id ?? null,
+                'year' => $request->query('year'),
+                'cra_id' => null,
+                'craData' => [],
+                'error' => 'Error fetching CRA data: ' . $e->getMessage(),
             ]);
         }
     }
@@ -1323,20 +1513,20 @@ class CRAController extends Controller
             }
 
             // --- Lifelines
-            $lifelines = [];
-            foreach ($calamity['lifelines'] as $life) {
-                foreach ((array)$life['category'] as $category) {
-                    foreach ($life['descriptions'] as $desc) {
-                        $lifelines[] = [
-                            'barangay_id' => $brgy_id,
-                            'cra_id' => $cra->id,
-                            'disaster_id' => $disaster_id,
-                            'category'    => $category,
-                            'description' => $desc['description'],
-                            'value'       => $desc['value'] ?? 0,
-                            'source'      => $desc['source'] ?? null,
-                        ];
-                    }
+           $lifelines = [];
+            foreach (($calamity['lifelines'] ?? []) as $life) {
+                $category = $life['category'] ?? null;
+
+                foreach (($life['descriptions'] ?? []) as $desc) {
+                    $lifelines[] = [
+                        'barangay_id' => $brgy_id,
+                        'cra_id' => $cra->id,
+                        'disaster_id' => $disaster_id,
+                        'category' => $category,
+                        'description' => $desc['description'] ?? null,
+                        'value' => $desc['value'] ?? '',
+                        'source' => $desc['source'] ?? null,
+                    ];
                 }
             }
 

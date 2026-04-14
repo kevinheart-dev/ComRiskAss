@@ -148,21 +148,12 @@ class CRAStoreRequest extends FormRequest
             'calamities.*.agriculture.*.source'      => ['nullable', 'string'],
 
             // Lifelines
-            'calamities.*.lifelines'                               => ['nullable', 'array', 'min:1'],
-
-            'calamities.*.lifelines.0.category'   => ['nullable', 'array', 'min:1'],
-            'calamities.*.lifelines.0.category.*' => ['nullable', 'string'],
-
-            // cover index 1–9
-            'calamities.*.lifelines.1.category' => ['nullable', 'string'],
-            'calamities.*.lifelines.2.category' => ['nullable', 'string'],
-            'calamities.*.lifelines.3.category' => ['nullable', 'string'],
-            'calamities.*.lifelines.4.category' => ['nullable', 'string'],
-
-            'calamities.*.lifelines.*.descriptions'                => ['nullable', 'array'],
-            'calamities.*.lifelines.*.descriptions.*.description'  => ['nullable', 'string'],
-            'calamities.*.lifelines.*.descriptions.*.value'        => ['nullable', 'string'], // descriptive text allowed
-            'calamities.*.lifelines.*.descriptions.*.source'       => ['nullable', 'string'],
+            'calamities.*.lifelines' => ['nullable', 'array', 'min:1'],
+            'calamities.*.lifelines.*.category' => ['nullable', 'string'],
+            'calamities.*.lifelines.*.descriptions' => ['nullable', 'array'],
+            'calamities.*.lifelines.*.descriptions.*.description' => ['nullable', 'string'],
+            'calamities.*.lifelines.*.descriptions.*.value' => ['nullable', 'string'],
+            'calamities.*.lifelines.*.descriptions.*.source' => ['nullable', 'string'],
 
             // Hazards
             'hazards'                           => ['nullable', 'array'],

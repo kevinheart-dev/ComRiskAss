@@ -41,7 +41,8 @@ const EffectDisaster = () => {
         const hasValidHazard =
             disasterData.length > 0 &&
             disasterData.some(
-                (hazard) => Array.isArray(hazard.rows) && hazard.rows.length > 0
+                (hazard) =>
+                    Array.isArray(hazard.rows) && hazard.rows.length > 0,
             );
 
         if (!hasValidHazard) {
@@ -75,7 +76,7 @@ const EffectDisaster = () => {
                 return { ...prev, disaster_per_purok: updatedDisasters };
             });
         },
-        [setCraData]
+        [setCraData],
     );
 
     const updateHazardType = (hIdx, value) =>
@@ -104,7 +105,7 @@ const EffectDisaster = () => {
         setCraData((prev) => ({
             ...prev,
             disaster_per_purok: (prev.disaster_per_purok || []).filter(
-                (_, i) => i !== hIdx
+                (_, i) => i !== hIdx,
             ),
         }));
         toast.success("Hazard category removed!");
@@ -148,7 +149,7 @@ const EffectDisaster = () => {
                                 onChange={(e) =>
                                     updateHazardType(
                                         hIdx,
-                                        toTitleCase(e.target.value)
+                                        toTitleCase(e.target.value),
                                     )
                                 }
                                 items={[
@@ -169,27 +170,27 @@ const EffectDisaster = () => {
                                         label: "Vehicular Incident",
                                     },
                                     {
-                                        value: "Pandemic / Emerging and Re-emerging Diseases",
-                                        label: "Pandemic / Emerging and Re-emerging Diseases",
+                                        value: "Pandemic / Emerging And Re-emerging Diseases",
+                                        label: "Pandemic / Emerging And Re-emerging Diseases",
                                     },
                                     // Optional: show previously typed value if not in list
                                     ...(hazard.type &&
-                                        ![
-                                            "Typhoon",
-                                            "Flood",
-                                            "Rain-induced Landslide",
-                                            "Fire",
-                                            "Drought",
-                                            "Earthquake",
-                                            "Vehicular Incident",
-                                            "Pandemic / Emerging and Re-emerging Diseases",
-                                        ].includes(hazard.type)
+                                    ![
+                                        "Typhoon",
+                                        "Flood",
+                                        "Rain-induced Landslide",
+                                        "Fire",
+                                        "Drought",
+                                        "Earthquake",
+                                        "Vehicular Incident",
+                                        "Pandemic / Emerging and Re-emerging Diseases",
+                                    ].includes(hazard.type)
                                         ? [
-                                            {
-                                                value: hazard.type,
-                                                label: hazard.type,
-                                            },
-                                        ]
+                                              {
+                                                  value: hazard.type,
+                                                  label: hazard.type,
+                                              },
+                                          ]
                                         : []),
                                 ]}
                                 placeholder="Select hazard"
@@ -258,7 +259,7 @@ const EffectDisaster = () => {
                                                             hIdx,
                                                             rIdx,
                                                             "purok",
-                                                            e.target.value
+                                                            e.target.value,
                                                         )
                                                     }
                                                     className="border w-full px-2 py-1 text-center text-xs"
@@ -278,7 +279,7 @@ const EffectDisaster = () => {
                                                                 hIdx,
                                                                 rIdx,
                                                                 key,
-                                                                e.target.value
+                                                                e.target.value,
                                                             )
                                                         }
                                                         className="border w-full px-2 py-1 text-center text-xs"

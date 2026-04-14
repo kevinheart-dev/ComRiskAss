@@ -5,10 +5,22 @@ import { StepperContext } from "@/context/StepperContext";
 const DEFAULT_ROWS = [
     { value: "Number of Informal Settler Families", count: "" },
     { value: "Number of Employed Individuals", count: "" },
-    { value: "Number of Families Aware of the Effects of Risks and Hazards", count: "" },
-    { value: "Number of Families with Access to Information (radio/TV/newspaper/social media, etc.)", count: "" },
-    { value: "Number of Families who received Financial Assistance", count: "" },
-    { value: "Number of Families with Access to Early Warning System", count: "" },
+    {
+        value: "Number of Families Aware of the Effects of Risks and Hazards",
+        count: "",
+    },
+    {
+        value: "Number of Families with Access to Information (radio/TV/newspaper/social media, etc.)",
+        count: "",
+    },
+    {
+        value: "Number of Families who received Financial Assistance",
+        count: "",
+    },
+    {
+        value: "Number of Families with Access to Early Warning System",
+        count: "",
+    },
 ];
 
 const FamilyAtRiskTable = () => {
@@ -17,13 +29,16 @@ const FamilyAtRiskTable = () => {
     console.log(craData);
     // Initialize family_at_risk if empty
     useEffect(() => {
-        setCraData(prev => {
+        setCraData((prev) => {
             if (!prev.family_at_risk || !prev.family_at_risk.length) {
                 return {
                     ...prev,
                     family_at_risk: [
-                        { purok: "1", rowsValue: DEFAULT_ROWS.map(r => ({ ...r })) }
-                    ]
+                        {
+                            purok: "1",
+                            rowsValue: DEFAULT_ROWS.map((r) => ({ ...r })),
+                        },
+                    ],
                 };
             }
             return prev;
@@ -31,18 +46,20 @@ const FamilyAtRiskTable = () => {
     }, [setCraData]);
 
     const familyList = Array.isArray(craData?.family_at_risk)
-        ? craData.family_at_risk.map(item => ({
-            ...item,
-            rowsValue: item.rowsValue || DEFAULT_ROWS.map(r => ({ ...r })),
-        }))
-        : [{ purok: "1", rowsValue: DEFAULT_ROWS.map(r => ({ ...r })) }];
+        ? craData.family_at_risk.map((item) => ({
+              ...item,
+              rowsValue: item.rowsValue || DEFAULT_ROWS.map((r) => ({ ...r })),
+          }))
+        : [{ purok: "1", rowsValue: DEFAULT_ROWS.map((r) => ({ ...r })) }];
 
     const updateRow = (index, rowIndex, value) => {
-        setCraData(prev => {
+        setCraData((prev) => {
             const updated = prev.family_at_risk.map((item, i) => {
                 if (i !== index) return item;
                 const newRows = item.rowsValue.map((row, rIdx) =>
-                    rIdx === rowIndex ? { ...row, count: value.replace(/\D/g, "") } : row
+                    rIdx === rowIndex
+                        ? { ...row, count: value.replace(/\D/g, "") }
+                        : row,
                 );
                 return { ...item, rowsValue: newRows };
             });
@@ -51,11 +68,11 @@ const FamilyAtRiskTable = () => {
     };
 
     const addPurok = () => {
-        setCraData(prev => {
+        setCraData((prev) => {
             const current = prev.family_at_risk || [];
             const newPurok = {
                 purok: `${current.length + 1}`,
-                rowsValue: DEFAULT_ROWS.map(r => ({ ...r })),
+                rowsValue: DEFAULT_ROWS.map((r) => ({ ...r })),
             };
             return { ...prev, family_at_risk: [...current, newPurok] };
         });
@@ -67,16 +84,21 @@ const FamilyAtRiskTable = () => {
             toast.error("Default Purok cannot be removed.");
             return;
         }
-        setCraData(prev => ({
+        setCraData((prev) => ({
             ...prev,
-            family_at_risk: (prev.family_at_risk || []).filter((_, i) => i !== index)
+            family_at_risk: (prev.family_at_risk || []).filter(
+                (_, i) => i !== index,
+            ),
         }));
         toast.error("Purok removed!");
     };
 
     const calculateTotals = () =>
         DEFAULT_ROWS.map((_, idx) =>
-            familyList.reduce((sum, item) => sum + Number(item.rowsValue?.[idx]?.count || 0), 0)
+            familyList.reduce(
+                (sum, item) => sum + Number(item.rowsValue?.[idx]?.count || 0),
+                0,
+            ),
         );
 
     const familyTotals = calculateTotals();
@@ -90,7 +112,12 @@ const FamilyAtRiskTable = () => {
                         <tr className="bg-gray-100">
                             <th className="border p-1 text-center">Purok</th>
                             {DEFAULT_ROWS.map((row, idx) => (
-                                <th key={idx} className="border p-1 text-center">{row.value}</th>
+                                <th
+                                    key={idx}
+                                    className="border p-1 text-center"
+                                >
+                                    {row.value}
+                                </th>
                             ))}
                             <th className="border p-1 text-center">Actions</th>
                         </tr>
@@ -98,13 +125,21 @@ const FamilyAtRiskTable = () => {
                     <tbody>
                         {familyList.map((purok, pIdx) => (
                             <tr key={pIdx} className="hover:bg-gray-50">
-                                <td className="border p-1 text-center">{purok.purok}</td>
+                                <td className="border p-1 text-center">
+                                    {purok.purok}
+                                </td>
                                 {purok.rowsValue.map((row, rIdx) => (
                                     <td key={rIdx} className="border p-1">
                                         <input
                                             type="text"
-                                            value={row.count || ""}
-                                            onChange={e => updateRow(pIdx, rIdx, e.target.value)}
+                                            value={row.count || 0}
+                                            onChange={(e) =>
+                                                updateRow(
+                                                    pIdx,
+                                                    rIdx,
+                                                    e.target.value,
+                                                )
+                                            }
                                             className="w-full text-center text-xs p-1 border rounded"
                                         />
                                     </td>
@@ -124,7 +159,12 @@ const FamilyAtRiskTable = () => {
                         <tr className="bg-gray-200 font-bold">
                             <td className="border p-1 text-center">Total</td>
                             {familyTotals.map((total, idx) => (
-                                <td key={idx} className="border p-1 text-center">{total}</td>
+                                <td
+                                    key={idx}
+                                    className="border p-1 text-center"
+                                >
+                                    {total}
+                                </td>
                             ))}
                             <td className="border p-1"></td>
                         </tr>

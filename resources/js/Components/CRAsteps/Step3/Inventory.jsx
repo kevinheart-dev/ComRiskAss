@@ -86,7 +86,7 @@ const Inventory = () => {
                 return { ...prev, disaster_inventory: updated };
             });
         },
-        [setCraData]
+        [setCraData],
     );
 
     const updateCategory = (hIdx, cIdx, updater) =>
@@ -128,7 +128,7 @@ const Inventory = () => {
         setCraData((prev) => ({
             ...prev,
             disaster_inventory: prev.disaster_inventory.filter(
-                (_, i) => i !== hIdx
+                (_, i) => i !== hIdx,
             ),
         }));
         toast.error("Hazard removed!");
@@ -197,8 +197,8 @@ const Inventory = () => {
                                     label: "Vehicular Incident",
                                 },
                                 {
-                                    value: "Pandemic / Emerging and Re-emerging Diseases",
-                                    label: "Pandemic / Emerging and Re-emerging Diseases",
+                                    value: "Pandemic / Emerging And Re-emerging Diseases",
+                                    label: "Pandemic / Emerging And Re-emerging Diseases",
                                 },
                                 // keep old user-entered hazard if not in list
                                 ...(hazard.hazard &&
@@ -210,7 +210,7 @@ const Inventory = () => {
                                     "Drought",
                                     "Earthquake",
                                     "Vehicular Incident",
-                                    "Pandemic / Emerging and Re-emerging Diseases",
+                                    "Pandemic / Emerging And Re-emerging Diseases",
                                 ].includes(hazard.hazard)
                                     ? [
                                           {
@@ -297,8 +297,8 @@ const Inventory = () => {
                                                                 "item",
                                                                 toTitleCase(
                                                                     e.target
-                                                                        .value
-                                                                )
+                                                                        .value,
+                                                                ),
                                                             )
                                                         }
                                                         className="border w-full px-2 py-1 text-xs text-center rounded"
@@ -329,7 +329,7 @@ const Inventory = () => {
                                                                     val =
                                                                         val.replace(
                                                                             /%/g,
-                                                                            ""
+                                                                            "",
                                                                         );
                                                                     if (
                                                                         val !==
@@ -346,7 +346,7 @@ const Inventory = () => {
                                                                     cIdx,
                                                                     rIdx,
                                                                     field,
-                                                                    val
+                                                                    val,
                                                                 );
                                                             }}
                                                             className="border w-full px-2 py-1 text-xs text-center rounded"
@@ -360,7 +360,7 @@ const Inventory = () => {
                                                             removeRow(
                                                                 hIdx,
                                                                 cIdx,
-                                                                rIdx
+                                                                rIdx,
                                                             )
                                                         }
                                                     >

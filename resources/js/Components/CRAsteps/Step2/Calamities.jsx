@@ -48,6 +48,7 @@ const propertyCategories = [
 
 const defaultLifelines = [
     {
+        category: "Transportation Facilities",
         defaultDescriptions: [
             "Transportation Facilities (extent of damage or worth of damage)",
         ],
@@ -151,20 +152,12 @@ const defaultCalamity = () => ({
         source: "",
     })),
     lifelines: defaultLifelines.map((life) => ({
-        category: life.category || life.defaultDescriptions,
-        descriptions: Array.isArray(life.defaultDescriptions)
-            ? life.defaultDescriptions.map((desc) => ({
-                  description: desc,
-                  value: "",
-                  source: "",
-              }))
-            : [
-                  {
-                      description: life.defaultDescriptions,
-                      value: "",
-                      source: "",
-                  },
-              ],
+        category: life.category,
+        descriptions: life.defaultDescriptions.map((desc) => ({
+            description: desc,
+            value: "",
+            source: "",
+        })),
     })),
 });
 
@@ -189,7 +182,7 @@ const CalamityTable = ({ calamities, updateCell }) => {
                                         updateCell(
                                             idx,
                                             "disaster_name",
-                                            toTitleCase(e.target.value)
+                                            toTitleCase(e.target.value),
                                         )
                                     }
                                 />
@@ -260,7 +253,7 @@ const CalamityTable = ({ calamities, updateCell }) => {
                                                     e.target.value,
                                                     rowIdx,
                                                     null,
-                                                    "value"
+                                                    "value",
                                                 )
                                             }
                                         />
@@ -277,7 +270,7 @@ const CalamityTable = ({ calamities, updateCell }) => {
                                                     e.target.value,
                                                     rowIdx,
                                                     null,
-                                                    "source"
+                                                    "source",
                                                 )
                                             }
                                         />
@@ -318,7 +311,7 @@ const CalamityTable = ({ calamities, updateCell }) => {
                                                     e.target.value,
                                                     rowIdx,
                                                     null,
-                                                    "value"
+                                                    "value",
                                                 )
                                             }
                                         />
@@ -335,7 +328,7 @@ const CalamityTable = ({ calamities, updateCell }) => {
                                                     e.target.value,
                                                     rowIdx,
                                                     null,
-                                                    "source"
+                                                    "source",
                                                 )
                                             }
                                         />
@@ -393,7 +386,7 @@ const CalamityTable = ({ calamities, updateCell }) => {
                                                             e.target.value,
                                                             rowIdx,
                                                             descIdx,
-                                                            "value"
+                                                            "value",
                                                         )
                                                     }
                                                 />
@@ -412,7 +405,7 @@ const CalamityTable = ({ calamities, updateCell }) => {
                                                             e.target.value,
                                                             rowIdx,
                                                             descIdx,
-                                                            "source"
+                                                            "source",
                                                         )
                                                     }
                                                 />
@@ -457,7 +450,7 @@ const CalamityTable = ({ calamities, updateCell }) => {
                                                     e.target.value,
                                                     rowIdx,
                                                     null,
-                                                    "value"
+                                                    "value",
                                                 )
                                             }
                                         />
@@ -474,7 +467,7 @@ const CalamityTable = ({ calamities, updateCell }) => {
                                                     e.target.value,
                                                     rowIdx,
                                                     null,
-                                                    "source"
+                                                    "source",
                                                 )
                                             }
                                         />
@@ -534,7 +527,7 @@ const CalamityTable = ({ calamities, updateCell }) => {
                                                             e.target.value,
                                                             rowIdx,
                                                             descIdx,
-                                                            "value"
+                                                            "value",
                                                         )
                                                     }
                                                 />
@@ -553,7 +546,7 @@ const CalamityTable = ({ calamities, updateCell }) => {
                                                             e.target.value,
                                                             rowIdx,
                                                             descIdx,
-                                                            "source"
+                                                            "source",
                                                         )
                                                     }
                                                 />
@@ -614,7 +607,7 @@ const CalamityTable = ({ calamities, updateCell }) => {
                                                             e.target.value,
                                                             rowIdx,
                                                             descIdx,
-                                                            "value"
+                                                            "value",
                                                         )
                                                     }
                                                 />
@@ -633,7 +626,7 @@ const CalamityTable = ({ calamities, updateCell }) => {
                                                             e.target.value,
                                                             rowIdx,
                                                             descIdx,
-                                                            "source"
+                                                            "source",
                                                         )
                                                     }
                                                 />
@@ -681,7 +674,7 @@ export default function Calamities() {
                                         description: desc,
                                         value: "",
                                         source: "",
-                                    })
+                                    }),
                                 ),
                             })),
                       structure: cal.structure?.length
@@ -693,7 +686,7 @@ export default function Calamities() {
                                         description: desc,
                                         value: "",
                                         source: "",
-                                    })
+                                    }),
                                 ),
                             })),
                       agriculture: cal.agriculture?.length
@@ -708,7 +701,7 @@ export default function Calamities() {
                           : defaultLifelines.map((life) => ({
                                 category: life.category || "General",
                                 descriptions: (Array.isArray(
-                                    life.defaultDescriptions
+                                    life.defaultDescriptions,
                                 )
                                     ? life.defaultDescriptions
                                     : [life.defaultDescriptions]
@@ -746,7 +739,7 @@ export default function Calamities() {
             value,
             rowIdx = null,
             descIdx = null,
-            subField = null
+            subField = null,
         ) => {
             setCraData((prev) => {
                 const updated = [...prev.calamities]; // shallow copy of calamities
@@ -758,7 +751,7 @@ export default function Calamities() {
                             [field]: updated[calIdx][field].map((item, i) =>
                                 i === rowIdx
                                     ? { ...item, [subField]: value }
-                                    : item
+                                    : item,
                             ),
                         };
                     }
@@ -779,10 +772,10 @@ export default function Calamities() {
                                                             ...desc,
                                                             [subField]: value,
                                                         }
-                                                      : desc
+                                                      : desc,
                                           ),
                                       }
-                                    : cat
+                                    : cat,
                             ),
                         };
                     }
@@ -796,7 +789,7 @@ export default function Calamities() {
                 return { ...prev, calamities: updated };
             });
         },
-        [setCraData]
+        [setCraData],
     );
 
     return (

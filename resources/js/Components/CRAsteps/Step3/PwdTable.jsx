@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext, useRef } from "react";
 import { Plus, X } from "lucide-react";
 import toast from "react-hot-toast";
 import { StepperContext } from "@/context/StepperContext";
-import { toTitleCase } from '@/utils/stringFormat';
+import { toTitleCase } from "@/utils/stringFormat";
 
 const defaultDisabilities = [
     "Deaf/Hard of Hearing",
@@ -27,23 +27,45 @@ const ageGroups = [
 ];
 
 const subLabels = [
-    "M", "F",
-    "M", "F",
-    "M", "F",
-    "M", "F", "LGBTQ",
-    "M", "F", "LGBTQ",
-    "M", "F", "LGBTQ",
-    "M", "F", "LGBTQ",
+    "M",
+    "F",
+    "M",
+    "F",
+    "M",
+    "F",
+    "M",
+    "F",
+    "LGBTQ",
+    "M",
+    "F",
+    "LGBTQ",
+    "M",
+    "F",
+    "LGBTQ",
+    "M",
+    "F",
+    "LGBTQ",
 ];
 
 const categories = [
-    "age0_6M", "age0_6F",
-    "age7m_2yM", "age7m_2yF",
-    "age3_5M", "age3_5F",
-    "age6_12M", "age6_12F", "age6_12LGBTQ",
-    "age13_17M", "age13_17F", "age13_17LGBTQ",
-    "age18_59M", "age18_59F", "age18_59LGBTQ",
-    "age60upM", "age60upF", "age60upLGBTQ",
+    "age0_6M",
+    "age0_6F",
+    "age7m_2yM",
+    "age7m_2yF",
+    "age3_5M",
+    "age3_5F",
+    "age6_12M",
+    "age6_12F",
+    "age6_12LGBTQ",
+    "age13_17M",
+    "age13_17F",
+    "age13_17LGBTQ",
+    "age18_59M",
+    "age18_59F",
+    "age18_59LGBTQ",
+    "age60upM",
+    "age60upF",
+    "age60upLGBTQ",
 ];
 
 // Create a new row with optional type
@@ -53,16 +75,28 @@ const createRow = (type = "") =>
 const TableHeader = () => (
     <thead className="bg-gray-100 text-sm">
         <tr>
-            <th rowSpan="2" className="border p-1">Type</th>
+            <th rowSpan="2" className="border p-1">
+                Type
+            </th>
             {ageGroups.map((g, idx) => (
-                <th key={idx} colSpan={g.cols} className="border p-1 text-center">{g.label}</th>
+                <th
+                    key={idx}
+                    colSpan={g.cols}
+                    className="border p-1 text-center"
+                >
+                    {g.label}
+                </th>
             ))}
-            <th rowSpan="2" className="border p-1 text-center">TOTAL</th>
+            <th rowSpan="2" className="border p-1 text-center">
+                TOTAL
+            </th>
             <th rowSpan="2" className="border p-1"></th>
         </tr>
         <tr>
             {subLabels.map((lbl, idx) => (
-                <th key={idx} className="border p-1 text-center">{lbl}</th>
+                <th key={idx} className="border p-1 text-center">
+                    {lbl}
+                </th>
             ))}
         </tr>
     </thead>
@@ -71,18 +105,25 @@ const TableHeader = () => (
 const DisabilityRow = ({ row, rowIdx, updateField, removeRow, inputRefs }) => {
     // Determine if the type field should be editable
     // It's editable if it's an empty string (new row) OR if it's not one of the default disabilities
-    const isTypeEditable = row.type === "" || !defaultDisabilities.includes(row.type);
+    const isTypeEditable =
+        row.type === "" || !defaultDisabilities.includes(row.type);
 
     return (
         <tr>
             <td className="border p-1 text-sm">
                 {isTypeEditable ? (
                     <input
-                        ref={el => inputRefs.current[rowIdx] = el}
+                        ref={(el) => (inputRefs.current[rowIdx] = el)}
                         type="text"
                         value={row.type}
                         className="w-full border p-1 text-sm"
-                        onChange={(e) => updateField(rowIdx, "type", toTitleCase(e.target.value))}
+                        onChange={(e) =>
+                            updateField(
+                                rowIdx,
+                                "type",
+                                toTitleCase(e.target.value),
+                            )
+                        }
                         placeholder="Enter Disability"
                     />
                 ) : (
@@ -97,7 +138,9 @@ const DisabilityRow = ({ row, rowIdx, updateField, removeRow, inputRefs }) => {
                         type="text"
                         value={row[field]}
                         className="w-full text-center border p-1"
-                        onChange={(e) => updateField(rowIdx, field, e.target.value)}
+                        onChange={(e) =>
+                            updateField(rowIdx, field, e.target.value)
+                        }
                     />
                 </td>
             ))}
@@ -132,7 +175,12 @@ const TotalsRow = ({ rows }) => (
             </td>
         ))}
         <td className="border p-1 text-center">
-            {rows.reduce((sum, row) => sum + categories.reduce((s, f) => s + (Number(row[f]) || 0), 0), 0)}
+            {rows.reduce(
+                (sum, row) =>
+                    sum +
+                    categories.reduce((s, f) => s + (Number(row[f]) || 0), 0),
+                0,
+            )}
         </td>
         <td className="border p-1"></td>
     </tr>
@@ -143,20 +191,30 @@ export default function PwdTable() {
     const inputRefs = useRef([]);
 
     const [rows, setRows] = useState(
-        craData.pwd?.length ? craData.pwd : defaultDisabilities.map((type) => createRow(type))
+        craData.pwd?.length
+            ? craData.pwd
+            : defaultDisabilities.map((type) => createRow(type)),
     );
 
     // Sync with StepperContext
     useEffect(() => {
-        setCraData(prev => ({ ...prev, pwd: rows }));
+        setCraData((prev) => ({ ...prev, pwd: rows }));
     }, [rows, setCraData]);
+
+    useEffect(() => {
+        if (Array.isArray(craData.pwd) && craData.pwd.length > 0) {
+            setRows(craData.pwd);
+        }
+    }, [craData.pwd]);
 
     const updateField = (rowIdx, field, value) => {
         const newRows = rows.map((row, idx) => {
             if (idx === rowIdx) {
                 return {
                     ...row,
-                    [field]: categories.includes(field) ? value.replace(/\D/g, "") : value,
+                    [field]: categories.includes(field)
+                        ? value.replace(/\D/g, "")
+                        : value,
                     // Only numeric for category fields
                     // Letters allowed for "type"
                 };
@@ -167,7 +225,7 @@ export default function PwdTable() {
     };
 
     const addDisabilityRow = () => {
-        setRows(prev => {
+        setRows((prev) => {
             const newRows = [...prev, createRow()];
             setTimeout(() => inputRefs.current[newRows.length - 1]?.focus(), 0); // autofocus new input
             return newRows;

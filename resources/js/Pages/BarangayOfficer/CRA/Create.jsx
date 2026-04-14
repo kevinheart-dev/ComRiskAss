@@ -1,7 +1,7 @@
 import BreadCrumbsHeader from "@/Components/BreadcrumbsHeader";
 import AdminLayout from "@/Layouts/AdminLayout";
 import { Head, router, usePage } from "@inertiajs/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import Stepper from "@/Components/Stepper";
 import StepperController from "@/Components/StepperControler";
 import { StepperContext } from "@/context/StepperContext";
@@ -11,7 +11,6 @@ import Hazard from "@/Components/CRAsteps/Step3/Hazard";
 import Calamities from "@/Components/CRAsteps/Step2/Calamities";
 import InventoryEvacuation from "@/Components/CRAsteps/Step4/InventoryEvacuation";
 import DisasterReadiness from "@/Components/CRAsteps/Step5/DisasterReadiness";
-import { Progress } from "@/Components/ui/progress";
 import {
     defaultLivelihoods,
     defaultInfra,
@@ -19,296 +18,192 @@ import {
     defaultFacilities,
 } from "@/Components/CRAsteps/defaults";
 
+// ADD THESE
+import { dynamicMapper } from "@/services/dynamicMapper";
+import { populationMapping } from "@/services/populationMapping";
+import { livelihoodMapping } from "@/services/livelihoodMapping";
+import { buildingFacilityMapping } from "@/services/buildingFacilityMapping";
+import { institutionHumanMapping } from "@/services/institutionHumanMapping";
+import { calamityMapping } from "@/services/calamityMapping";
+import { hazardMapping } from "@/services/hazardMapping";
+import { riskMapping } from "@/services/riskMapping";
+import { exposureMapping } from "@/services/exposureMapping";
+import { pwdMapping } from "@/services/pwdMapping";
+import { familyRiskMapping } from "@/services/familyRiskMapping";
+import { illnessesMapping } from "@/services/illnessesMapping";
+import { disasterPerPurokMapping } from "@/services/disasterPerPurokMapping ";
+import { disasterInventoryMapping } from "@/services/disasterInventoryMapping ";
+import { evacuationListMapping } from "@/services/evacuationMapping";
+import { evacuationCenterInventoryMapping } from "@/services/evacuationCenterInventoryMapping";
+import { affectedAreasMapping } from "@/services/affectedAreasMapping";
+import { livelihoodEvacuationMapping } from "@/services/livelihoodEvacuationMapping";
+import { foodInventoryMapping } from "@/services/foodInventoryMapping";
+import { reliefGoodsMapping } from "@/services/reliefGoodsMapping";
+import { distributionProcessMapping } from "@/services/distributionProcessMapping";
+import { trainingsInventoryMapping } from "@/services/trainingsInventoryMapping";
+import { equipmentInventoryMapping } from "@/services/equipmentInventoryMapping";
+import { bdrrmcDirectoryMapping } from "@/services/bdrrmcDirectoryMapping";
+import { evacuationPlanMapping } from "@/services/evacuationPlanMapping";
+
+function mapBackendCraToFrontend(serverData, selectedYear, defaults) {
+    if (
+        !serverData ||
+        typeof serverData !== "object" ||
+        Array.isArray(serverData)
+    ) {
+        return defaults;
+    }
+
+    return {
+        ...defaults,
+
+        // Step 1: A
+        ...dynamicMapper(serverData, populationMapping),
+
+        // Step B & C
+        ...dynamicMapper(serverData, livelihoodMapping),
+
+        // Step D & E
+        ...dynamicMapper(serverData, buildingFacilityMapping),
+
+        // Step F & G 🔥
+        ...dynamicMapper(serverData, institutionHumanMapping),
+
+        ...dynamicMapper(serverData, calamityMapping),
+        ...dynamicMapper(serverData, hazardMapping),
+        ...dynamicMapper(serverData, riskMapping),
+        ...dynamicMapper(serverData, exposureMapping),
+        ...dynamicMapper(serverData, pwdMapping),
+        ...dynamicMapper(serverData, familyRiskMapping),
+        ...dynamicMapper(serverData, illnessesMapping),
+        ...dynamicMapper(serverData, disasterPerPurokMapping),
+        ...dynamicMapper(serverData, disasterInventoryMapping),
+        ...dynamicMapper(serverData, evacuationListMapping),
+        ...dynamicMapper(serverData, evacuationCenterInventoryMapping),
+        ...dynamicMapper(serverData, affectedAreasMapping),
+        ...dynamicMapper(serverData, livelihoodEvacuationMapping),
+        ...dynamicMapper(serverData, foodInventoryMapping),
+        ...dynamicMapper(serverData, reliefGoodsMapping),
+        ...dynamicMapper(serverData, distributionProcessMapping),
+        ...dynamicMapper(serverData, trainingsInventoryMapping),
+        ...dynamicMapper(serverData, equipmentInventoryMapping),
+        ...dynamicMapper(serverData, bdrrmcDirectoryMapping),
+        ...dynamicMapper(serverData, evacuationPlanMapping),
+
+        year: serverData?.cra?.year ?? selectedYear,
+    };
+}
+
 export default function Index({ progress, barangay_id }) {
     const breadcrumbs = [
         { label: "Community Risk Assessment (CRA)", showOnMobile: false },
     ];
 
-    const [currentStep, setCurrentStep] = useState(1);
     const { props } = usePage();
-    // const { success, error } = props;
     const { success, error, craData: craDataFromServer } = props;
+    console.log(craDataFromServer);
+    const steps = useMemo(
+        () => [
+            "Barangay Resource Profile",
+            "Community Disaster History",
+            "Barangay Risk Assessment",
+            "Inventory & Evacuations",
+            "Disaster Readiness",
+        ],
+        [],
+    );
 
-    // ✅ Get year from URL
-    const searchParams = new URLSearchParams(window.location.search);
-    const yearFromUrl = searchParams.get("year") || "default";
+    const yearFromUrl = useMemo(() => {
+        if (typeof window === "undefined") return "default";
+        return (
+            new URLSearchParams(window.location.search).get("year") || "default"
+        );
+    }, []);
+
+    const [currentStep, setCurrentStep] = useState(1);
     const [year, setYear] = useState(yearFromUrl);
-
-    // const [craData, setCraData] = useState(() => {
-    //     try {
-    //         const saved = localStorage.getItem(`craDataDraft_${yearFromUrl}`);
-
-    //         if (saved) {
-    //             const parsed = JSON.parse(saved);
-
-    //             // ✅ Ensure defaults always exist even in old saved data
-    //             return {
-    //                 population: parsed.population ?? [],
-    //                 livelihood: parsed.livelihood?.length
-    //                     ? parsed.livelihood
-    //                     : (defaultLivelihoods ?? []).map(type => ({
-    //                         type,
-    //                         male_no_dis: "",
-    //                         male_dis: "",
-    //                         female_no_dis: "",
-    //                         female_dis: "",
-    //                         lgbtq_no_dis: "",
-    //                         lgbtq_dis: "",
-    //                     })),
-    //                 infrastructure: parsed.infrastructure ?? (defaultInfra ?? []),
-    //                 institutions: parsed.institutions ?? [],
-    //                 hazards: parsed.hazards ?? [],
-    //                 evacuation: parsed.evacuation ?? [],
-    //                 buildings: parsed.buildings ?? JSON.parse(JSON.stringify(defaultBuildings)),
-    //                 facilities: parsed.facilities ?? JSON.parse(JSON.stringify(defaultFacilities)),
-    //                 year: parsed.year ?? yearFromUrl,
-    //             };
-    //         }
-    //         return {
-    //             population: [],
-    //             livelihood: (defaultLivelihoods ?? []).map(type => ({
-    //                 type,
-    //                 male_no_dis: "",
-    //                 male_dis: "",
-    //                 female_no_dis: "",
-    //                 female_dis: "",
-    //                 lgbtq_no_dis: "",
-    //                 lgbtq_dis: "",
-    //             })),
-
-    //             infrastructure: defaultInfra ?? [],
-    //             institutions: [],
-    //             hazards: [],
-    //             evacuation: [],
-    //             buildings: JSON.parse(JSON.stringify(defaultBuildings)),
-    //             facilities: JSON.parse(JSON.stringify(defaultFacilities)),
-    //             year: yearFromUrl,
-    //         };
-    //     } catch (err) {
-    //         console.error("Error loading draft:", err);
-    //         return {
-    //             population: [],
-    //             livelihood: (defaultLivelihoods ?? []).map(type => ({
-    //                 type,
-    //                 male_no_dis: "",
-    //                 male_dis: "",
-    //                 female_no_dis: "",
-    //                 female_dis: "",
-    //                 lgbtq_no_dis: "",
-    //                 lgbtq_dis: "",
-    //             })),
-
-    //             infrastructure: defaultInfra ?? [],
-    //             institutions: [],
-    //             hazards: [],
-    //             evacuation: [],
-    //             buildings: JSON.parse(JSON.stringify(defaultBuildings)),
-    //             facilities: JSON.parse(JSON.stringify(defaultFacilities)),
-    //             year: yearFromUrl,
-    //         };
-    //     }
-    // });
-
-    // const [craData, setCraData] = useState(() => {
-    //     try {
-    //         const saved = localStorage.getItem(`craDataDraft_${yearFromUrl}`);
-    //         return saved
-    //             ? JSON.parse(saved)
-    //             : {
-    //                   population: [],
-    //                   livelihood: (defaultLivelihoods ?? []).map((type) => ({
-    //                       type,
-    //                       male_no_dis: "",
-    //                       male_dis: "",
-    //                       female_no_dis: "",
-    //                       female_dis: "",
-    //                       lgbtq_no_dis: "",
-    //                       lgbtq_dis: "",
-    //                   })),
-    //                   infrastructure: defaultInfra ?? [],
-    //                   institutions: [],
-    //                   hazards: [],
-    //                   evacuation: [],
-    //                   buildings: JSON.parse(JSON.stringify(defaultBuildings)),
-    //                   facilities: JSON.parse(JSON.stringify(defaultFacilities)),
-    //                   year: yearFromUrl,
-    //               };
-    //     } catch (err) {
-    //         console.error("Error loading draft:", err);
-    //         return {
-    //             population: [],
-    //             livelihood: (defaultLivelihoods ?? []).map((type) => ({
-    //                 type,
-    //                 male_no_dis: "",
-    //                 male_dis: "",
-    //                 female_no_dis: "",
-    //                 female_dis: "",
-    //                 lgbtq_no_dis: "",
-    //                 lgbtq_dis: "",
-    //             })),
-    //             infrastructure: defaultInfra ?? [],
-    //             institutions: [],
-    //             hazards: [],
-    //             evacuation: [],
-    //             buildings: JSON.parse(JSON.stringify(defaultBuildings)),
-    //             facilities: JSON.parse(JSON.stringify(defaultFacilities)),
-    //             year: yearFromUrl,
-    //         };
-    //     }
-    // });
-
-    const storageKey = `craDataDraft_${barangay_id}_${yearFromUrl}`;
-
-    const [craData, setCraData] = useState(() => {
-        try {
-            const saved = localStorage.getItem(storageKey);
-            return saved
-                ? JSON.parse(saved)
-                : {
-                      population: [],
-                      livelihood: (defaultLivelihoods ?? []).map((type) => ({
-                          type,
-                          male_no_dis: "",
-                          male_dis: "",
-                          female_no_dis: "",
-                          female_dis: "",
-                          lgbtq_no_dis: "",
-                          lgbtq_dis: "",
-                      })),
-                      infrastructure: defaultInfra ?? [],
-                      institutions: [],
-                      hazards: [],
-                      evacuation: [],
-                      buildings: JSON.parse(JSON.stringify(defaultBuildings)),
-                      facilities: JSON.parse(JSON.stringify(defaultFacilities)),
-                      year: yearFromUrl,
-                  };
-        } catch (err) {
-            console.error("Error loading draft:", err);
-            return {
-                population: [],
-                livelihood: (defaultLivelihoods ?? []).map((type) => ({
-                    type,
-                    male_no_dis: "",
-                    male_dis: "",
-                    female_no_dis: "",
-                    female_dis: "",
-                    lgbtq_no_dis: "",
-                    lgbtq_dis: "",
-                })),
-                infrastructure: defaultInfra ?? [],
-                institutions: [],
-                hazards: [],
-                evacuation: [],
-                buildings: JSON.parse(JSON.stringify(defaultBuildings)),
-                facilities: JSON.parse(JSON.stringify(defaultFacilities)),
-                year: yearFromUrl,
-            };
-        }
-    });
-
-    // useEffect(() => {
-    //     if (year) {
-    //         localStorage.setItem(
-    //             `craDataDraft_${year}`,
-    //             JSON.stringify(craData)
-    //         );
-    //     }
-    // }, [craData, year]);
-
-    useEffect(() => {
-        if (year && barangay_id) {
-            // UPDATED: Save with barangay_id in the key
-            localStorage.setItem(
-                `craDataDraft_${barangay_id}_${year}`,
-                JSON.stringify(craData)
-            );
-        }
-    }, [craData, year, barangay_id]); // Added barangay_id dependency
-
-    // useEffect(() => {
-    //     if (!year) return;
-
-    //     try {
-    //         const saved = localStorage.getItem(`craDataDraft_${year}`);
-
-    //         if (saved) {
-    //             setCraData(JSON.parse(saved));
-    //         } else {
-    //             setCraData({
-    //                 population: parsed.population ?? [],
-    //                 livelihood: (defaultLivelihoods ?? []).map((type) => ({
-    //                     type,
-    //                     male_no_dis: "",
-    //                     male_dis: "",
-    //                     female_no_dis: "",
-    //                     female_dis: "",
-    //                     lgbtq_no_dis: "",
-    //                     lgbtq_dis: "",
-    //                 })),
-    //                 infrastructure: defaultInfra ?? [],
-    //                 institutions: [],
-    //                 hazards: [],
-    //                 evacuation: [],
-    //                 buildings: JSON.parse(JSON.stringify(defaultBuildings)),
-    //                 facilities: JSON.parse(JSON.stringify(defaultFacilities)),
-    //                 year,
-    //             });
-    //         }
-    //     } catch (error) {
-    //         console.error("Error reloading draft:", error);
-    //     }
-    // }, [year]);
-
-    useEffect(() => {
-        if (!year || !barangay_id) return;
-
-        try {
-            // UPDATED: Load with barangay_id in the key
-            const saved = localStorage.getItem(
-                `craDataDraft_${barangay_id}_${year}`
-            );
-
-            if (saved) {
-                setCraData(JSON.parse(saved));
-            } else {
-                setCraData({
-                    population: [],
-                    livelihood: (defaultLivelihoods ?? []).map((type) => ({
-                        type,
-                        male_no_dis: "",
-                        male_dis: "",
-                        female_no_dis: "",
-                        female_dis: "",
-                        lgbtq_no_dis: "",
-                        lgbtq_dis: "",
-                    })),
-                    infrastructure: defaultInfra ?? [],
-                    institutions: [],
-                    hazards: [],
-                    evacuation: [],
-                    buildings: JSON.parse(JSON.stringify(defaultBuildings)),
-                    facilities: JSON.parse(JSON.stringify(defaultFacilities)),
-                    year,
-                });
-            }
-        } catch (error) {
-            console.error("Error reloading draft:", error);
-        }
-    }, [year, barangay_id]);
-
     const [finalData, setFinalData] = useState([]);
     const [errors, setErrors] = useState({});
 
-    const steps = [
-        "Barangay Resource Profile ",
-        "Community Disaster History",
-        "Barangay Risk Assessment",
-        "Inventory & Evacuations",
-        "Disaster Readiness",
-    ];
+    const getDefaultCraData = useCallback(
+        (selectedYear) => ({
+            population: [],
+            calamities: [],
 
-    const displayStep = (step) => {
+            livelihood: (defaultLivelihoods ?? []).map((type) => ({
+                type,
+                male_no_dis: "",
+                male_dis: "",
+                female_no_dis: "",
+                female_dis: "",
+                lgbtq_no_dis: "",
+                lgbtq_dis: "",
+            })),
+
+            infrastructure: defaultInfra ?? [],
+            institutions: [],
+            human_resources: [],
+            hazards: [],
+            evacuation: [],
+
+            buildings: structuredClone(defaultBuildings),
+            facilities: structuredClone(defaultFacilities),
+
+            risks: [],
+            vulnerabilities: [],
+            exposure: [],
+            pwd: [],
+            illnesses: [],
+            family_at_risk: [],
+            disaster_per_purok: [],
+            disaster_inventory: [],
+            evacuation_list: [],
+            evacuation_center_inventory: [],
+            livelihood_evacuation: [],
+            food_inventory: [],
+            relief_goods: [],
+            distribution_process: [],
+            trainings_inventory: [],
+            equipment_inventory: [],
+            bdrrmc_directory: [],
+            evacuation_plan: [],
+            affected_areas: [],
+
+            year: selectedYear,
+        }),
+        [],
+    );
+
+    const buildCraData = useCallback(
+        (selectedYear, serverData) => {
+            const defaults = getDefaultCraData(selectedYear);
+
+            return mapBackendCraToFrontend(serverData, selectedYear, defaults);
+        },
+        [getDefaultCraData],
+    );
+
+    const [craData, setCraData] = useState(() =>
+        buildCraData(yearFromUrl, craDataFromServer),
+    );
+
+    // useEffect(() => {
+    //     if (!year) return;
+    //     setCraData(buildCraData(year, craDataFromServer));
+    // }, [year, craDataFromServer, buildCraData]);
+    useEffect(() => {
+        if (!year) return;
+
+        if (craDataFromServer) {
+            setCraData((prev) => {
+                // only initialize from server if local data is still basically empty
+                if (prev && Object.keys(prev).length > 0) return prev;
+                return buildCraData(year, craDataFromServer);
+            });
+        }
+    }, [year, craDataFromServer, buildCraData]);
+
+    const displayStep = useCallback((step) => {
         switch (step) {
             case 1:
                 return <Population />;
@@ -323,111 +218,54 @@ export default function Index({ progress, barangay_id }) {
             default:
                 return null;
         }
-    };
+    }, []);
 
-    // ✅ Step navigation and submission
-    // const handleClick = (direction) => {
-    //     let newStep = currentStep;
+    const handleClick = useCallback(
+        (direction) => {
+            if (direction === "next") {
+                if (currentStep === steps.length) {
+                    router.post(
+                        route("cra.store"),
+                        { ...craData, barangay_id },
+                        {
+                            preserveState: true,
+                            preserveScroll: true,
 
-    //     if (direction === "next") {
-    //         if (currentStep === steps.length) {
-    //             // ✅ Submit to backend
-    //             router.post(route("cra.store"), craData, {
-    //                 onSuccess: () => {
-    //                     // // ✅ Remove local draft after successful submission
-    //                     // localStorage.removeItem(`craDataDraft_${year}`);
-    //                     toast.success("CRA submitted successfully!");
-    //                 },
-    //                 onError: (errors) => {
-    //                     setErrors(errors);
-    //                     console.error("Validation Errors:", errors);
+                            onSuccess: () => {
+                                toast.success("CRA submitted successfully!");
+                            },
 
-    //                     // ✅ Rehydrate data from local storage in case Inertia wiped it
-    //                     const saved = localStorage.getItem(
-    //                         `craDataDraft_${year}`
-    //                     );
-    //                     if (saved) {
-    //                         setCraData(JSON.parse(saved));
-    //                     }
+                            onError: (formErrors) => {
+                                setErrors(formErrors);
+                                console.error("Validation Errors:", formErrors);
 
-    //                     const allErrors = Object.values(errors).join("<br />");
-    //                     toast.error("Validation Errors", {
-    //                         description: (
-    //                             <div
-    //                                 dangerouslySetInnerHTML={{
-    //                                     __html: allErrors,
-    //                                 }}
-    //                             />
-    //                         ),
-    //                         duration: 5000,
-    //                         closeButton: true,
-    //                     });
-    //                 },
-    //             });
-    //             return;
-    //         }
-    //         newStep++;
-    //     } else {
-    //         newStep--;
-    //     }
-
-    //     if (newStep > 0 && newStep <= steps.length) {
-    //         setCurrentStep(newStep);
-    //     }
-    // };
-
-    const handleClick = (direction) => {
-        let newStep = currentStep;
-
-        if (direction === "next") {
-            if (currentStep === steps.length) {
-                router.post(
-                    route("cra.store"),
-                    { ...craData, barangay_id },
-                    {
-                        onSuccess: () => {
-                            // Remove specific draft
-                            localStorage.removeItem(
-                                `craDataDraft_${barangay_id}_${year}`
-                            );
-                            toast.success("CRA submitted successfully!");
+                                Object.values(formErrors).forEach((msg) => {
+                                    toast.error(msg);
+                                });
+                            },
                         },
-                        onError: (errors) => {
-                            setErrors(errors);
-                            console.error("Validation Errors:", errors);
+                    );
+                    return;
+                }
 
-                            // ✅ Rehydrate data from local storage (UPDATED KEY)
-                            const saved = localStorage.getItem(
-                                `craDataDraft_${barangay_id}_${year}`
-                            );
-                            if (saved) {
-                                setCraData(JSON.parse(saved));
-                            }
-
-                            // ... rest of error handling
-                        },
-                    }
-                );
+                setCurrentStep((prev) => Math.min(prev + 1, steps.length));
                 return;
             }
-            newStep++;
-        } else {
-            newStep--;
-        }
 
-        if (newStep > 0 && newStep <= steps.length) {
-            setCurrentStep(newStep);
-        }
-    };
-    // ✅ Handle print CRA PDF
-    const handlePrint = () => {
+            setCurrentStep((prev) => Math.max(prev - 1, 1));
+        },
+        [currentStep, steps.length, craData, barangay_id],
+    );
+
+    const handlePrint = useCallback(() => {
         if (!year) {
             toast.error("Year not set for CRA.");
             return;
         }
+
         const url = route("cra.pdf", { id: year });
         window.open(url, "_blank");
-    };
+    }, [year]);
 
     useEffect(() => {
         if (success) {
@@ -447,8 +285,21 @@ export default function Index({ progress, barangay_id }) {
                 closeButton: true,
             });
         }
-        props.error = null;
     }, [error]);
+
+    const stepperContextValue = useMemo(
+        () => ({
+            craData,
+            setCraData,
+            finalData,
+            setFinalData,
+            errors,
+            setErrors,
+            year,
+            setYear,
+        }),
+        [craData, finalData, errors, year],
+    );
 
     return (
         <AdminLayout>
@@ -456,22 +307,21 @@ export default function Index({ progress, barangay_id }) {
             <Head title="CRA" />
             <BreadCrumbsHeader breadcrumbs={breadcrumbs} />
 
-            <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8 mt-6">
-                <div className="text-left mb-6">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="mx-auto mt-6 max-w-7xl px-2 sm:px-6 lg:px-8">
+                <div className="mb-6 text-left">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                         <div>
                             <h1 className="text-2xl font-bold text-gray-800">
                                 Community Risk Assessment {year} (CRA)
                             </h1>
-                            <p className="text-gray-600 mt-1">
+                            <p className="mt-1 text-gray-600">
                                 Step-by-step process for evaluating barangay
                                 resources, hazards, and disaster readiness
                             </p>
                         </div>
 
-                        {/* Compact Progress Section */}
-                        <div className="bg-gray-50 rounded-lg p-3 shadow-sm border border-gray-200 w-full sm:w-64">
-                            <div className="flex justify-between items-center mb-1">
+                        <div className="w-full rounded-lg border border-gray-200 bg-gray-50 p-3 shadow-sm sm:w-64">
+                            <div className="mb-1 flex items-center justify-between">
                                 <h2 className="text-xs font-medium text-gray-700">
                                     Overall Progress
                                 </h2>
@@ -480,8 +330,7 @@ export default function Index({ progress, barangay_id }) {
                                 </span>
                             </div>
 
-                            {/* Progress Bar */}
-                            <div className="relative w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                            <div className="relative h-2 w-full overflow-hidden rounded-full bg-gray-200">
                                 <div
                                     className="absolute top-0 left-0 h-full rounded-full transition-all duration-500 ease-in-out"
                                     style={{
@@ -491,10 +340,10 @@ export default function Index({ progress, barangay_id }) {
                                                 ? "linear-gradient(to right, #16a34a, #22c55e)"
                                                 : "linear-gradient(to right, #3b82f6, #60a5fa)",
                                     }}
-                                ></div>
+                                />
                             </div>
 
-                            <div className="flex justify-between items-center gap-2 mt-2">
+                            <div className="mt-2 flex items-center justify-between gap-2">
                                 <div className="mt-1 text-[10px] text-gray-600">
                                     <p>
                                         <span className="font-medium">
@@ -516,7 +365,7 @@ export default function Index({ progress, barangay_id }) {
 
                                 <button
                                     onClick={handlePrint}
-                                    className="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-xs font-medium whitespace-nowrap"
+                                    className="whitespace-nowrap rounded bg-green-600 px-2 py-1 text-xs font-medium text-white hover:bg-green-700"
                                 >
                                     Print CRA
                                 </button>
@@ -525,24 +374,17 @@ export default function Index({ progress, barangay_id }) {
                     </div>
                 </div>
 
-                <div className="bg-blue-100 rounded-t-xl px-2 sm:px-6 lg:px-8 py-2 border-gray-200 shadow-lg flex justify-between items-center">
-                    <Stepper steps={steps} currentStep={currentStep} />
+                <div className="flex items-center justify-between rounded-t-xl bg-blue-100 px-2 py-2 shadow-lg sm:px-6 lg:px-8">
+                    <Stepper
+                        steps={steps}
+                        currentStep={currentStep}
+                        craData={craData}
+                    />
                 </div>
 
-                <div className="overflow-hidden bg-white border border-gray-200 rounded-b-xl p-2 drop-shadow-[0_4px_6px_rgba(0,0,0,0.1)]">
+                <div className="overflow-hidden rounded-b-xl border border-gray-200 bg-white p-2 drop-shadow-[0_4px_6px_rgba(0,0,0,0.1)]">
                     <div className="my-2 pb-5 pr-5 pl-5 pt-0">
-                        <StepperContext.Provider
-                            value={{
-                                craData,
-                                setCraData,
-                                finalData,
-                                setFinalData,
-                                errors,
-                                setErrors,
-                                year,
-                                setYear,
-                            }}
-                        >
+                        <StepperContext.Provider value={stepperContextValue}>
                             {displayStep(currentStep)}
                         </StepperContext.Provider>
                     </div>
