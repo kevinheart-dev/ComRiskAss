@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Barangay;
+use App\Models\CommunityRiskAssessment;
+use App\Models\CRAProgress;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -82,54 +84,74 @@ class BarangayCRAController extends Controller
      */
     public function show(string $id)
     {
-         $barangay = Barangay::with([
-            'generalPopulation',
-            'populationGenders',
-            'populationAgeGroups',
-            'populationExposures.hazard',
-            'bdrrmcDirectories',
-            'bdrrmcTrainings',
-            'disasterOccurances.agriDamages',
-            'disasterOccurances.damages',
-            'disasterOccurances.effectImpacts',
-            'disasterOccurances.lifelines',
-            'disasterOccurances.populationImpacts',
-            'disasterInventories.hazard',
-            'disasterRiskPopulations.hazard',
-            'primaryFacilities',
-            'infraFacilities',
-            'institutions',
-            'roadNetworks',
-            'publicTransportations',
-            'houseBuilds',
-            'houseOwnerships',
-            'householdServices',
-            'livelihoodStatistics',
-            'livelihoodEvacuationSites',
-            'reliefDistributions',
-            'reliefDistributionProcesses',
-            'equipmentInventories',
-            'evacuationCenters',
-            'evacuationInventories',
-            'evacuationPlans',
-            'familiesAtRisk',
-            'hazardRisks.hazard',
-            'assessmentMatrices.hazard',
-            'illnessesStats',
-            'disabilityStatistics',
-            'humanResources',
-            'affectedPlaces.hazard',
-            'prepositionedInventories'
-        ])->findOrFail($id);
+        $progress = CRAProgress::findOrFail($id);
 
-        // Reuse your existing transformer
+        $cra = CommunityRiskAssessment::findOrFail($progress->cra_id);
+        $barangay_id = $progress->barangay_id;
+
+        $barangay = Barangay::with([
+            'generalPopulation' => fn($q) => $q->where('cra_id', $cra->id),
+            'populationGenders' => fn($q) => $q->where('cra_id', $cra->id),
+            'populationAgeGroups' => fn($q) => $q->where('cra_id', $cra->id),
+            'populationExposures' => fn($q) => $q->where('cra_id', $cra->id)->with('hazard'),
+            'bdrrmcDirectories' => fn($q) => $q->where('cra_id', $cra->id),
+            'bdrrmcTrainings' => fn($q) => $q->where('cra_id', $cra->id),
+
+            'disasterOccurances' => fn($q) => $q->where('cra_id', $cra->id)->with([
+                'agriDamages',
+                'damages',
+                'effectImpacts',
+                'lifelines',
+                'populationImpacts',
+            ]),
+
+            'disasterInventories' => fn($q) => $q->where('cra_id', $cra->id)->with('hazard'),
+            'disasterRiskPopulations' => fn($q) => $q->where('cra_id', $cra->id)->with('hazard'),
+            'primaryFacilities' => fn($q) => $q->where('cra_id', $cra->id),
+            'infraFacilities' => fn($q) => $q->where('cra_id', $cra->id),
+            'institutions' => fn($q) => $q->where('cra_id', $cra->id),
+            'roadNetworks' => fn($q) => $q->where('cra_id', $cra->id),
+            'publicTransportations' => fn($q) => $q->where('cra_id', $cra->id),
+            'houseBuilds' => fn($q) => $q->where('cra_id', $cra->id),
+            'houseOwnerships' => fn($q) => $q->where('cra_id', $cra->id),
+            'householdServices' => fn($q) => $q->where('cra_id', $cra->id),
+            'livelihoodStatistics' => fn($q) => $q->where('cra_id', $cra->id),
+            'livelihoodEvacuationSites' => fn($q) => $q->where('cra_id', $cra->id),
+            'reliefDistributions' => fn($q) => $q->where('cra_id', $cra->id),
+            'reliefDistributionProcesses' => fn($q) => $q->where('cra_id', $cra->id),
+            'equipmentInventories' => fn($q) => $q->where('cra_id', $cra->id),
+            'evacuationCenters' => fn($q) => $q->where('cra_id', $cra->id),
+            'evacuationInventories' => fn($q) => $q->where('cra_id', $cra->id),
+            'evacuationPlans' => fn($q) => $q->where('cra_id', $cra->id),
+            'familiesAtRisk' => fn($q) => $q->where('cra_id', $cra->id),
+            'hazardRisks' => fn($q) => $q->where('cra_id', $cra->id)->with('hazard'),
+            'assessmentMatrices' => fn($q) => $q->where('cra_id', $cra->id)->with('hazard'),
+            'illnessesStats' => fn($q) => $q->where('cra_id', $cra->id),
+            'disabilityStatistics' => fn($q) => $q->where('cra_id', $cra->id),
+            'humanResources' => fn($q) => $q->where('cra_id', $cra->id),
+            'affectedPlaces' => fn($q) => $q->where('cra_id', $cra->id)->with('hazard'),
+            'prepositionedInventories' => fn($q) => $q->where('cra_id', $cra->id),
+        ])->findOrFail($barangay_id);
+
         $data = $barangay->dataCollection();
 
-        // Optional: structure similar to summary but only for one barangay
         $result = [
+            'progress' => [
+                'id' => $progress->id,
+                'barangay_id' => $progress->barangay_id,
+                'cra_id' => $progress->cra_id,
+                'percentage' => (float) $progress->percentage,
+                'submitted_at' => $progress->submitted_at,
+                'last_updated' => $progress->updated_at,
+            ],
+            'cra' => [
+                'id' => $cra->id,
+                'year' => $cra->year,
+            ],
             'barangay' => $data['barangay'] ?? null,
             'population_genders' => $data['population_genders'] ?? [],
             'population_age_groups' => $data['population_age_groups'] ?? [],
+            'population_exposures' => $data['population_exposures'] ?? [],
             'pwdDistribution' => $data['pwdDistribution'] ?? [],
             'bdrrmc_directory' => $data['bdrrmc_directory'] ?? [],
             'bdrrmc_trainings' => $data['bdrrmc_trainings'] ?? [],
@@ -162,8 +184,10 @@ class BarangayCRAController extends Controller
             'affected_areas' => $data['affected_areas'] ?? [],
             'prepositioned_inventories' => $data['prepositioned_inventories'] ?? [],
         ];
-
-        dd($data);
+        dd($result);
+        return Inertia::render('BarangayOfficer/CRA/Show', [
+            'data' => $result,
+        ]);
     }
 
     /**

@@ -42,16 +42,10 @@ export default function Index({ barangays, queryParams }) {
 
         router.get(route("cdrrmo.barangay.cra.index", queryParams));
     };
-    const ViewButton = ({ craId }) => {
-        if (!craId) {
+    const ViewButton = ({ progressId }) => {
+        if (!progressId) {
             return (
-                <div
-                    className="
-                    flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-md
-                    bg-gray-200 text-gray-500 border border-gray-200
-                    cursor-not-allowed select-none
-                "
-                >
+                <div className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-md bg-gray-200 text-gray-500 border border-gray-200 cursor-not-allowed select-none">
                     <Eye className="w-4 h-4" />
                     View
                 </div>
@@ -61,12 +55,10 @@ export default function Index({ barangays, queryParams }) {
         return (
             <Button
                 size="sm"
-                onClick={() => router.visit(route("barangay-cra.show", craId))}
-                className="
-                flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-md
-                bg-blue-500 hover:bg-blue-600 text-white border border-blue-500
-                transition
-            "
+                onClick={() =>
+                    router.visit(route("barangay-cra.show", progressId))
+                }
+                className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-md bg-blue-500 hover:bg-blue-600 text-white border border-blue-500 transition"
             >
                 <Eye className="w-4 h-4" />
                 View
@@ -173,11 +165,11 @@ export default function Index({ barangays, queryParams }) {
         },
 
         actions: (row) => {
-            const craId = row.latest_progress?.cra_id;
+            const progressId = row.latest_progress?.id;
 
             return (
                 <div className="flex items-center">
-                    <ViewButton craId={craId} />
+                    <ViewButton progressId={progressId} />
                 </div>
             );
         },
@@ -192,6 +184,7 @@ export default function Index({ barangays, queryParams }) {
 
             <div className="p-2 md:p-4">
                 <div className="mx-auto max-w-8xl px-2 sm:px-4 lg:px-6">
+                    {/* <pre>{JSON.stringify(barangays, undefined, 2)}</pre> */}
                     <div className="bg-white border border-gray-200 shadow-sm rounded-xl p-4">
                         {/* HEADER */}
                         <div className="mb-4">
