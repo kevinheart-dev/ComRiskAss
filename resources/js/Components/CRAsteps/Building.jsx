@@ -505,7 +505,7 @@ export default function Buildings() {
     return (
         <div className="space-y-4">
             <Accordion title="D. Buildings and other Facilities in the Barangay">
-                <p className="text-sm text-gray-600 italic mb-2">
+                <p className="text-sm text-yellow-400 italic mb-2">
                     <strong>Note:</strong> Leave a cell blank if the value is zero. Default building types cannot be removed or edited.
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -524,7 +524,7 @@ export default function Buildings() {
             </Accordion>
 
             <Accordion title="E. Primary Facilities and Services in the Barangay">
-                <p className="text-sm text-gray-600 italic mb-2">
+                <p className="text-sm text-yellow-400 italic mb-2">
                     <strong>Note:</strong> Leave a cell blank if the value is zero. Default facility types cannot be removed or edited.
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
