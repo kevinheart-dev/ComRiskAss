@@ -85,10 +85,23 @@ export default function Population() {
         });
     };
 
+    // const getRowTotal = (index) => {
+    //     const fields = craData.population?.[index] || {};
+    //     return Object.entries(fields)
+    //         .filter(([key]) => key !== "ageGroup")
+    //         .reduce((a, [, b]) => a + (b || 0), 0);
+    // };
+
     const getRowTotal = (index) => {
         const fields = craData.population?.[index] || {};
+
         return Object.entries(fields)
-            .filter(([key]) => key !== "ageGroup")
+            .filter(
+                ([key]) =>
+                    key !== "ageGroup" &&
+                    key !== "lgbtq_no_dis" &&
+                    key !== "lgbtq_dis"
+            )
             .reduce((a, [, b]) => a + (b || 0), 0);
     };
 
@@ -258,8 +271,9 @@ export default function Population() {
                     <h2 className="text-lg font-semibold mb-3 mt-6">
                         Population according to Age
                     </h2>
-                    <p className="text-sm text-gray-600 italic mb-2">
-                        <strong>Note:</strong> Leave a cell blank if the value is zero.
+                    <p className="text-sm text-yellow-400 italic mb-2">
+                        <strong>Note:</strong> Leave a cell blank if the value is zero. <br />
+                        <strong>Note:</strong> LGBTQ+ counts are for reference only and not included in the grand total.
                     </p>
                     <table className="w-full border text-sm">
                         <thead className="bg-gray-100">
@@ -372,7 +386,7 @@ export default function Population() {
                         <h2 className="text-lg font-semibold mb-3">
                             Number of Houses according to Build (Materials Used)
                         </h2>
-                        <p className="text-sm text-gray-600 italic mb-2">
+                        <p className="text-sm text-yellow-400 italic mb-2">
                             <strong>Note:</strong> Leave a cell blank if the value is zero.
                         </p>
                         <div className="flex-1">
@@ -463,7 +477,7 @@ export default function Population() {
                         <h2 className="text-lg font-semibold mb-3">
                             Number of Houses according to Type of Ownership
                         </h2>
-                        <p className="text-sm text-gray-600 italic mb-2">
+                        <p className="text-sm text-yellow-400 italic mb-2">
                             <strong>Note:</strong> Leave a cell blank if the value is zero.
                         </p>
                         <div className="flex-1">

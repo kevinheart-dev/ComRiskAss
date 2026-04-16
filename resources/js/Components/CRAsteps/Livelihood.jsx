@@ -86,7 +86,7 @@ const LivelihoodTable = React.memo(function LivelihoodTable({ data, defaultLivel
     return (
         <section>
             <h2 className="text-lg font-semibold mb-3">Primary Livelihood of Residents</h2>
-            <p className="text-sm text-gray-600 italic mb-2">
+            <p className="text-sm text-yellow-400 italic mb-2">
                 <strong>Note:</strong> Leave a cell blank if the value is zero. Default livelihoods cannot be removed or edited.
             </p>
             <table className="w-full border text-sm">
@@ -170,7 +170,7 @@ const LivelihoodTable = React.memo(function LivelihoodTable({ data, defaultLivel
                 >
                     + Add new row
                 </button>
-                <p className="text-sm text-gray-600 italic">
+                <p className="text-sm text-yellow-400 italic">
                     <strong>Note:</strong> Add a new row if the livelihood type is not specified.
                 </p>
             </div>
@@ -252,7 +252,7 @@ const InfraTable = React.memo(function InfraTable({ category, catIdx, defaultCat
                 >
                     <span className="text-sm font-bold">+</span> Add new row
                 </button>
-                <p className="text-xs text-gray-600 italic">
+                <p className="text-xs text-yellow-400 italic">
                     <strong>Note:</strong> Add a new row if needed.
                 </p>
             </div>
@@ -413,7 +413,7 @@ export default function Livelihood() {
 
             <Accordion title="C. Infrastructures and Institutions that provide services to the Barangay">
                 <div className="grid gap-4">
-                    <p className="text-sm text-gray-600 italic mb-2">
+                    <p className="text-sm text-yellow-400 italic mb-2">
                         <strong>Note:</strong> Leave a cell blank if the value is zero.
                     </p>
                     <div className="grid grid-cols-3 gap-4">

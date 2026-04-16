@@ -154,7 +154,7 @@ function HumanResourcesTable({ category, catIdx, updateCategoryName, updateRow, 
                 >
                     <span className="text-sm font-bold">+</span> Add new row
                 </button>
-                <p className="text-xs text-gray-600 italic mt-3">
+                <p className="text-xs text-yellow-400 italic mt-3">
                     <strong>Note:</strong> Add a new row if needed.
                 </p>
             </div>
@@ -258,7 +258,7 @@ function InstitutionsTable({ institutions, instIdx, updateField, removeInstituti
                 >
                     <span className="text-sm font-bold">+</span> Add new row
                 </button>
-                <p className="text-xs text-gray-600 italic mt-2">
+                <p className="text-xs text-yellow-400 italic mt-2">
                     <strong>Note:</strong> Add a new row if needed.
                 </p>
             </div>
@@ -364,7 +364,7 @@ const InstitutionHuman = () => {
 
 
             <Accordion title="G. Inventory of Human Resources">
-                <p className="text-sm text-gray-600 italic mb-2">
+                <p className="text-sm text-yellow-400 italic mb-2">
                     <strong>Note:</strong> Leave a cell blank if the value is zero.
                 </p>
                 <div className="mb-10 border-2 border-purple-300 rounded-xl p-5 bg-purple-50 shadow-sm">
