@@ -121,16 +121,16 @@ function ExposureTable({
                         },
                         // Allow custom typed hazard to still show if previously typed
                         ...(riskType &&
-                            ![
-                                "Typhoon",
-                                "Flood",
-                                "Rain-induced Landslide",
-                                "Fire",
-                                "Drought",
-                                "Earthquake",
-                                "Vehicular Incident",
-                                "Pandemic / Emerging and Re-emerging Diseases",
-                            ].includes(riskType)
+                        ![
+                            "Typhoon",
+                            "Flood",
+                            "Rain-induced Landslide",
+                            "Fire",
+                            "Drought",
+                            "Earthquake",
+                            "Vehicular Incident",
+                            "Pandemic / Emerging and Re-emerging Diseases",
+                        ].includes(riskType)
                             ? [{ value: riskType, label: riskType }]
                             : []),
                     ]}
@@ -381,7 +381,7 @@ function ExposureTable({
                                             tableId,
                                             idx,
                                             "purok",
-                                            e.target.value
+                                            e.target.value,
                                         )
                                     }
                                     placeholder="1"
@@ -399,7 +399,7 @@ function ExposureTable({
                                                 tableId,
                                                 idx,
                                                 field,
-                                                e.target.value
+                                                e.target.value,
                                             )
                                         }
                                     />
@@ -426,7 +426,7 @@ function ExposureTable({
                                 {(purokData || []).reduce(
                                     (sum, row) =>
                                         sum + (Number(row[field]) || 0),
-                                    0
+                                    0,
                                 )}
                             </td>
                         ))}
@@ -448,11 +448,15 @@ function ExposureTable({
 const ExposureDatabase = () => {
     const { craData, setCraData } = useContext(StepperContext);
 
-    const [tables, setTables] = useState(
-        craData.exposure || [
-            { riskType: "", purokData: [createEmptyPurokRow("1")] },
-        ]
-    );
+    const tables =
+        craData.exposure?.length > 0
+            ? craData.exposure
+            : [
+                  {
+                      riskType: "",
+                      purokData: [createEmptyPurokRow("1")],
+                  },
+              ];
 
     useEffect(() => {
         setCraData((prev) => ({
@@ -462,97 +466,108 @@ const ExposureDatabase = () => {
     }, [tables, setCraData]);
 
     const updateRiskType = (tableIdx, newRiskType) => {
-        setTables((prev) =>
-            prev.map((t, idx) =>
-                idx === tableIdx ? { ...t, riskType: newRiskType } : t
-            )
-        );
+        setCraData((prev) => ({
+            ...prev,
+            exposure: prev.exposure.map((t, idx) =>
+                idx === tableIdx ? { ...t, riskType: newRiskType } : t,
+            ),
+        }));
     };
 
     const updatePurokField = (tableIdx, purokIdx, field, val) => {
-        setTables((prev) =>
-            prev.map((t, idx) =>
+        setCraData((prev) => ({
+            ...prev,
+            exposure: prev.exposure.map((t, idx) =>
                 idx === tableIdx
                     ? {
-                        ...t,
-                        purokData: t.purokData.map((row, rIdx) =>
-                            rIdx === purokIdx
-                                ? {
-                                    ...row,
-                                    [field]: val === "" ? "" : Number(val),
-                                }
-                                : row
-                        ),
-                    }
-                    : t
-            )
-        );
+                          ...t,
+                          purokData: t.purokData.map((row, rIdx) =>
+                              rIdx === purokIdx
+                                  ? {
+                                        ...row,
+                                        [field]: val === "" ? "" : Number(val),
+                                    }
+                                  : row,
+                          ),
+                      }
+                    : t,
+            ),
+        }));
     };
 
     const addPurokRow = (tableIdx) => {
-        setTables((prev) =>
-            prev.map((t, idx) =>
+        setCraData((prev) => ({
+            ...prev,
+            exposure: prev.exposure.map((t, idx) =>
                 idx === tableIdx
                     ? {
-                        ...t,
-                        purokData: [
-                            ...t.purokData,
-                            createEmptyPurokRow(
-                                (t.purokData.length + 1).toString()
-                            ),
-                        ],
-                    }
-                    : t
-            )
-        );
+                          ...t,
+                          purokData: [
+                              ...t.purokData,
+                              createEmptyPurokRow(
+                                  (t.purokData.length + 1).toString(),
+                              ),
+                          ],
+                      }
+                    : t,
+            ),
+        }));
     };
 
     const removePurokRow = (tableIdx, purokIdx) => {
-        setTables((prev) =>
-            prev.map((t, idx) =>
+        setCraData((prev) => ({
+            ...prev,
+            exposure: prev.exposure.map((t, idx) =>
                 idx === tableIdx
                     ? {
-                        ...t,
-                        purokData: t.purokData.filter(
-                            (_, rIdx) => rIdx !== purokIdx
-                        ),
-                    }
-                    : t
-            )
-        );
+                          ...t,
+                          purokData: t.purokData.filter(
+                              (_, rIdx) => rIdx !== purokIdx,
+                          ),
+                      }
+                    : t,
+            ),
+        }));
     };
 
     const addTable = () => {
-        setTables((prev) => {
-            if (prev.length === 0) {
-                return [
-                    {
-                        riskType: "",
-                        purokData: [createEmptyPurokRow("1")],
-                    },
-                ];
+        setCraData((prev) => {
+            const exposure = prev.exposure ?? [];
+
+            if (exposure.length === 0) {
+                return {
+                    ...prev,
+                    exposure: [
+                        {
+                            riskType: "",
+                            purokData: [createEmptyPurokRow("1")],
+                        },
+                    ],
+                };
             }
 
-            const lastTable = prev[prev.length - 1];
+            const lastTable = exposure[exposure.length - 1];
 
-            // Deep clone the last table's purok data
-            const clonedPurokData = lastTable.purokData.map((row) => ({
-                ...row,
-            }));
-
-            return [
+            return {
                 ...prev,
-                {
-                    riskType: lastTable.riskType || "",
-                    purokData: clonedPurokData,
-                },
-            ];
+                exposure: [
+                    ...exposure,
+                    {
+                        riskType: lastTable.riskType || "",
+                        purokData: lastTable.purokData.map((row) => ({
+                            ...row,
+                        })),
+                    },
+                ],
+            };
         });
     };
     const removeTable = (tableIdx) => {
-        setTables((prev) => prev.filter((_, idx) => idx !== tableIdx));
+        setCraData((prev) => ({
+            ...prev,
+            exposure: prev.exposure.filter((_, idx) => idx !== tableIdx),
+        }));
     };
-
     return (
         <div className="space-y-5">
             <p className="text-md font-bold">3.1 Population</p>
