@@ -7,6 +7,7 @@ export default function Sidebar({ children }) {
     return (
         <SidebarProvider>
             <AppSidebar auth={auth} />
+            {/* TESTT */}
             <main className="w-full bg-gray-100">{children}</main>
         </SidebarProvider>
     );
