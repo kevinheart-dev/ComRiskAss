@@ -3,30 +3,7 @@ import { StepperContext } from "@/context/StepperContext";
 import toast from "react-hot-toast";
 import { Check, X } from "lucide-react";
 import { toTitleCase } from '@/utils/stringFormat';
-
-const TRAINING_TITLES = [
-    "Training on RA 10121 (Philippine Disaster Risk Reduction and Management Act)",
-    "Training on RA 10821 (Children’s Emergency Relief and Protection Act)",
-    "Training on Child Protection in Emergencies",
-    "Training on Pre- Disaster Risk Assessment",
-    "Training on the Protocol for Management of the Dead and Missing",
-    "Training on Camp Management",
-    "Training on Incident Command System",
-    "Training on Psychological First Aid",
-    "First Aid at Basic Life Support Training",
-    "Basic Search and Rescue Training",
-    "Training on Psychological First Aid",
-    "Training on Mental Health and Psychosocial Support",
-    "Community-Based Reduction and Management (CBDRRM) Training",
-    "Mental Health and Psychosocial Support (MHPSS) Training",
-    "Training on the Conduct of Simulation/Drills for Priority Hazards",
-    "Training on Rapid Damage Assessment and Needs Analysis (RDANA)",
-    "Training on Minimum Health Protocols",
-    "Training on Contact Tracing and Reporting",
-    "Training on Public Service Continuity",
-    "Training on Basic Disease Surveillance and Reporting",
-    "QAS for BDRRM and Committee training workshop",
-];
+import { defaultTrainingTitles } from "../defaults";
 
 const ROW_TEMPLATE = {
     title: "",
@@ -42,21 +19,20 @@ const TrainingsInventory = () => {
     const { craData, setCraData } = useContext(StepperContext);
     const textareaRefs = useRef([]);
 
-    // Initialize table in stepper with default titles
     useEffect(() => {
-        if (!craData.trainings_inventory ||
+        if (
+            !craData.trainings_inventory ||
             craData.trainings_inventory.length === 0
         ) {
             setCraData((prev) => ({
                 ...prev,
-                trainings_inventory: TRAINING_TITLES.map((t) => ({
+                trainings_inventory: defaultTrainingTitles.map((title) => ({
                     ...ROW_TEMPLATE,
-                    t,
+                    title,
                 })),
             }));
         }
-    }, [craData.trainings_inventory]);
-
+    }, [craData.trainings_inventory, setCraData]);
     const rows = craData.trainings_inventory || [];
 
     const updateCell = (index, field, value) => {

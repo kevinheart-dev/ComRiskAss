@@ -47,9 +47,9 @@ const FamilyAtRiskTable = () => {
 
     const familyList = Array.isArray(craData?.family_at_risk)
         ? craData.family_at_risk.map((item) => ({
-              ...item,
-              rowsValue: item.rowsValue || DEFAULT_ROWS.map((r) => ({ ...r })),
-          }))
+            ...item,
+            rowsValue: item.rowsValue || DEFAULT_ROWS.map((r) => ({ ...r })),
+        }))
         : [{ purok: "1", rowsValue: DEFAULT_ROWS.map((r) => ({ ...r })) }];
 
     const updateRow = (index, rowIndex, value) => {
@@ -132,7 +132,8 @@ const FamilyAtRiskTable = () => {
                                     <td key={rIdx} className="border p-1">
                                         <input
                                             type="text"
-                                            value={row.count || 0}
+                                            value={row.count}
+                                            placeholder="0"
                                             onChange={(e) =>
                                                 updateRow(
                                                     pIdx,
